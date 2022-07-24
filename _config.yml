@@ -21,7 +21,8 @@
 title: Rails 101
 email: bryant.daniel.j@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Rails 101.
+  Fast track your understanding of using Ruby on Rails as the backend
+  and backbone a modern architecture.
 baseurl: "" # the subpath of your site, e.g. /blog
 domain: rails101.github.io
 url: https://rails101.github.io # the base hostname & protocol for your site, e.g. http://example.com

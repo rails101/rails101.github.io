@@ -1,123 +1,41 @@
 ---
 layout: default
+title:  "Rails 101"
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+# Welcome
 
-[Link to another page](./about).
+This guide represents an accumulation of knowledge and best practices that I have developed over years of working with Ruby on Rails and, more recently, combining it with GraphQL to build powerful APIs. I wrote this for you and I hope you enjoy it.
 
-There should be whitespace between paragraphs.
+## Chapters
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
-
-# Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
-
-## Header 2
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### Header 3
-
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
-
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
-
-#### Header 4
-
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-
-##### Header 5
-
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
-
-###### Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
+{% assign posts = site.posts | sort:"date" %}
+{% for post in posts %}
+  1. [{{ post.title }}]({{ post.url }})
+{% endfor %}
 
 * * *
 
-### Here is an unordered list:
+## Questions
 
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
+### Who should read this guide?
 
-### And an ordered list:
+This guide is for anyone new to [Ruby on Rails](https://rubyonrails.org/) or [GraphQL Ruby](https://graphql-ruby.org/), anyone looking for a refresher, or anyone that's interested in modern best practices.
 
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
+### What is in this guide?
 
-### And a nested list:
+The contents of this guide aim to give the reader a basic understanding of [Ruby on Rails](https://rubyonrails.org/) and how it, combined with several other technologies like [GraphQL](https://graphql.org/) and [PostgreSQL](https://www.postgresql.org/), can be used to build a **stable** and **scalable** backend.
 
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
+### What about the client side?
 
-### Small image
+Building a front end is outside the scope of this guide, but there will soon be a React project that you can follow along with.
 
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
+### How long should this guide take?
 
-### Large image
+You should be able to read and work through this guide in 1-2 days.
 
-![Branching](https://docs.github.com/assets/cb-23923/images/help/repository/branching.png)
+### What are the core technologies covered?
 
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+* Ruby on Rails
+* GraphQL
+* PostgreSQL
