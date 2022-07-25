@@ -1,0 +1,172 @@
+---
+layout: default
+title:  "Chapter 4 - The Individual"
+date:   2022-07-04 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want to see an individual user, so that I can focus on them.
+```
+
+We'll need another root-level field named `user`. Since we've already got GraphQL completely set up, adding this field should be trivial. There will be one new concept. We'll need to accept an ID parameter. In GraphQL, that is accomplished with the `argument` helper.
+
+Let's add the `user` field to `QueryType`.
+
+> `app/graphql/types/query_type.rb`
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
+    include GraphQL::Types::Relay::HasNodeField
+    include GraphQL::Types::Relay::HasNodesField
+
+    # Add root-level fields here.
+    # They will be entry points for queries on your schema.
+
+    field :users, [Types::UserType], null: false,
+      description: "List all users in email order"
+
+    field :user, Types::UserType, "Find a user by ID", null: false do
+      argument :id, ID
+    end
+
+    def users
+      User.all.order(:email)
+    end
+
+    def user(id:)
+      User.find(id)
+    end
+  end
+end
+```
+
+Since `find` will raise an error if it fails to find a record, we need to handle that as well. Luckily, [GraphQL documentation](https://graphql-ruby.org/errors/error_handling.html) gives us some clear guidance on how to do that.
+
+Let's add some global error handling.
+
+> `app/graphql/all_hands_schema.rb` (lines omitted)
+
+```ruby
+class AllHandsSchema < GraphQL::Schema
+  # ...
+
+  rescue_from(ActiveRecord::RecordNotFound) do |err, obj, args, ctx, field|
+    raise GraphQL::ExecutionError, "#{field.type.unwrap.graphql_name} not found"
+  end
+
+  # ...
+end
+```
+
+Let's generate a test for our new field.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/query_type/user
+      invoke  test_unit
+      create    test/integration/types/query_type/user_test.rb
+```
+
+Let's fill in the generated test.
+
+> `test/integration/types/query_type/user_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UserTest < ActionDispatch::IntegrationTest
+  setup do
+    @query = <<~GRAPHQL
+      query User($id: ID!) {
+        user(id: $id) {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+  end
+
+  test "user" do
+    user = users(:daniel)
+
+    post graphql_path, params: { query: @query, variables: { id: user.id } }
+
+    assert_equal(
+      {
+        "data" => {
+          "user" => {
+            "id" => user.id.to_s,
+            "name" => user.name,
+            "email" => user.email,
+            "createdAt" => user.created_at.iso8601,
+            "updatedAt" => user.updated_at.iso8601,
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+
+  test "user not found" do
+    post graphql_path, params: { query: @query, variables: { id: "0" } }
+
+    assert_equal(
+      {
+        "data" => nil,
+        "errors" => [
+          {
+            "message" => "User not found",
+            "locations" => [{ "line" => 2, "column" => 3 }],
+            "path" => ["user"],
+          },
+        ],
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+This is only slightly more complicated than the previous test class. Here, we pass our arguments using the `variables` parameter. We also name our query and declare its variables. The same tests could be written using Ruby string interpolation, but this way is cleaner.
+
+Let's run our new tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/user_test.rb
+Running 2 tests in a single process (parallelization threshold is 50)
+Run options: --seed 23651
+
+# Running:
+
+..
+
+Finished in 0.151358s, 13.2137 runs/s, 13.2137 assertions/s.
+2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to see an individual user, so that I can focus on them.
+```
