@@ -1,0 +1,183 @@
+---
+layout: default
+title:  "Chapter 3 - The Graph"
+date:   2022-07-03 00:00:00 0000
+categories: guide
+---
+
+Before we continue with the what, let's think about the why. In this guide, we'll use [users stories](https://en.wikipedia.org/wiki/User_story) to guide the work that we do. Writing user stories is a best practice for feature work. Things like bug fixes and technical cleanup may not fit into this model.
+
+Let's start with our first user story.
+
+```
+📝 As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
+```
+
+First, we have to decide which type of API to build. [GraphQL](https://graphql.org/) has been steadily growing in popularity thanks to its long list of benefits. Our specific flavor will be [GraphQL Ruby](https://graphql-ruby.org/).
+
+Let's get started by adding the gem to our project.
+
+> `Gemfile` (lines omitted)
+
+```ruby
+# Use Graphql for the API
+gem "graphql", "~> 2.0"
+```
+
+Let's make sure to install it.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bundle
+$ bin/rails g graphql:install
+$ bundle
+```
+
+You'll see that a lot of boilerplate code has been generated.
+
+Let's make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+Let's commit the changes before moving on.
+
+```
+✅ Make a commit
+```
+
+Let's generate a new type to match our existing model.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:object User
+      create  app/graphql/types/user_type.rb
+```
+
+Take a good look at `app/graphql/types/user_type.rb`. Since our type name matches our model name, the generator was able to identify the columns and add matching fields. Too easy! Next, we need to expose this new type in the API. The way we do that is by adding a root-level field to our `QueryType`. Let's add a field named `users`.
+
+> `app/graphql/types/query_type.rb`
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
+    include GraphQL::Types::Relay::HasNodeField
+    include GraphQL::Types::Relay::HasNodesField
+
+    # Add root-level fields here.
+    # They will be entry points for queries on your schema.
+
+    field :users, [Types::UserType], null: false,
+      description: "List all users in email order"
+
+    def users
+      User.all.order(:email)
+    end
+  end
+end
+```
+
+Our `users` field should be working, but we need to be sure. This generator did not generate any tests for us like the model generator did. We'll have to start from scratch. Both [GraphQL](https://graphql-ruby.org/testing/integration_tests.html) and [Rails](https://guides.rubyonrails.org/testing.html) provide some insight on the kinds of tests we can write. In general, unit tests test individual objects and integration tests test the application from top to bottom. We previously wrote unit tests for the `User` model. It's fairly difficult to write unit tests for GraphQL types because `new` is actually a `protected` method. Fortunately, Rails and Graphql make it easy for us to write integration tests. You might notice that the term "integration test" is a little fuzzy between Graphql and Rails. What's important is understanding that we're making a real HTTP request and checking the result. Let's write one.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/query_type/users
+      invoke  test_unit
+      create    test/integration/types/query_type/users_test.rb
+```
+
+Let's fill in the generated test.
+
+> `test/integration/types/query_type/users_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UsersTest < ActionDispatch::IntegrationTest
+  test "users" do
+    query = <<~GRAPHQL
+      {
+        users {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    users_in_email_order = [
+      users(:adrian),
+      users(:chantel),
+      users(:daniel),
+      users(:sarah),
+    ]
+
+    assert_equal(
+      {
+        "data" => {
+          "users" => users_in_email_order.map { |user|
+            {
+              "id" => user.id.to_s,
+              "name" => user.name,
+              "email" => user.email,
+              "createdAt" => user.created_at.iso8601,
+              "updatedAt" => user.updated_at.iso8601,
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+This test should seem very straightforward. We make a real request to our graphql endpoint with the query param set to our graphql query. No magic, no mocks, just a real request and a real response. In the response, we expect there to be users ordered by their emails. `@response.parsed_body` is a call to a helper method that parses the response body as JSON, returning a hash. Similarly, `@response.body` would give us a string. Our only assertion is that the parsed body equals the expected hash exactly. This might feel brittle at first - it should. There's no room for error here. Our responses should be exact and consistent, every time. If this test is flaky or becomes flaky over time, you mostly likely have an issue.
+
+Let's run our new tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/users_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 54676
+
+# Running:
+
+.
+
+Finished in 0.140711s, 7.1068 runs/s, 7.1068 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
+```
