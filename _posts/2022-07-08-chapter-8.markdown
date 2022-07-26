@@ -1,0 +1,387 @@
+---
+layout: default
+title:  "Chapter 8 - The N"
+date:   2022-07-08 00:00:00 0000
+categories: guide
+---
+
+What we have works, but something stands out. Whenever we're requesting records through one or more levels of `has_many`, we should be on the lookout for N+1 queries. These issues are hard to write automated tests for, but very easy to spot with the naked eye. Since we are potentially requesting multiple levels of records in `rounds`, let's see if we have some bad queries lurking.
+
+Let's start tailing our test logs.
+
+> **Terminal** (output omitted)
+
+```bash
+$ tail -f log/test.log
+```
+
+You'll need to leave this running.
+
+Let's run the tests again.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 52072
+
+# Running:
+
+.
+
+Finished in 0.198494s, 5.0379 runs/s, 5.0379 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Taking a look at our logs, you should see two distinct sets of lines. The first set is related to loading fixtures and other setup. The second set is related to the test itself. Furthermore, for the test lines, we're only concerned about lines related to the actual request, the lines that happen between `Started` and `Completed`. Here's what I see:
+
+```bash
+-----------------------------------------
+Types::QueryType::RoundsTest: test_rounds
+-----------------------------------------
+Started POST "/graphql" for 127.0.0.1 at 2022-07-25 22:32:18 -0400
+Processing by GraphqlController#execute as HTML
+  Parameters: {"query"=>"{\n  rounds {\n    id\n    createdAt\n    updatedAt\n    selections {\n      id\n      createdAt\n      updatedAt\n      user {\n        id\n        name\n        email\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n"}
+  Round Load (0.2ms)  SELECT "rounds".* FROM "rounds" ORDER BY "rounds"."id" ASC
+  Selection Load (0.2ms)  SELECT "selections".* FROM "selections" WHERE "selections"."round_id" = $1 ORDER BY "selections"."id" ASC  [["round_id", 298486374]]
+  Selection Load (0.1ms)  SELECT "selections".* FROM "selections" WHERE "selections"."round_id" = $1 ORDER BY "selections"."id" ASC  [["round_id", 980190962]]
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2  [["id", 321975000], ["LIMIT", 1]]
+  User Load (0.1ms)  SELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2  [["id", 860399843], ["LIMIT", 1]]
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2  [["id", 235152081], ["LIMIT", 1]]
+  User Load (0.2ms)  SELECT "users".* FROM "users" WHERE "users"."id" = $1 LIMIT $2  [["id", 109342749], ["LIMIT", 1]]
+Completed 200 OK in 39ms (Views: 0.5ms | ActiveRecord: 1.5ms | Allocations: 17573)
+```
+
+See how the same queries are being run back-to-back? That's what we're looking for. That doesn't look too bad, so let's make it worse.
+
+Let's add some additional users.
+
+> `test/integration/types/query_type/rounds_test.rb` (lines omitted)
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
+  test "rounds" do
+    100.times do
+      round = Round.create!
+      users.each { |u| round.selections.create!(user: u) }
+    end
+
+    # ...
+  end
+end
+```
+
+Let's run the tests again.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+```
+
+Don't mind the failure, but take a look back at the logs and things are much worse! We can see the cache helping out a bit, but we can do better. Our main weapon against N+1 queries is [includes](https://guides.rubyonrails.org/active_record_querying.html#includes).
+
+Let's include `selections` and `users` in our root-level field.
+
+> `app/graphql/types/query_type.rb` (lines omitted)
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # ...
+
+    def rounds
+      Round.all.includes(selections: :user).order(:id)
+    end
+
+    # ...
+  end
+end
+```
+
+Let's run the tests again.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+```
+
+Check the logs and things should look much better. You can see that, `includes` has drastically cut down the number of requests to the database. We now make a single `SELECT` each, for `rounds`, `selections`, and `users`.
+
+Let's go ahead and undo the changes to `test/integration/types/query_type/rounds_test.rb`.
+
+Let's run the tests again.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 1996
+
+# Running:
+
+.
+
+Finished in 0.172344s, 5.8023 runs/s, 5.8023 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Tests are passing again and our logs should look the same as before, just with less data this time.
+
+We've drastically cut down the number of SQL requests, but there's one last issue. With graphql, it's left up to the client to decide what data they want. With our current logic, we may be making **too many** requests to the database. For example, if the client does not include the `user` field, our `SELECT "users".* FROM "users" ...` would be for nothing. I'm getting dizzy. If only there was a way for us to know which records we should include. Lucky for us, we have the [Lookahead](https://graphql-ruby.org/queries/lookahead.html). We'll need to refactor our `rounds` field one last time.
+
+Let's add new tests for the new scenarios.
+
+> `test/integration/types/query_type/rounds_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
+  test "rounds" do
+    query = <<~GRAPHQL
+      {
+        rounds {
+          id
+          createdAt
+          updatedAt
+          selections {
+            id
+            createdAt
+            updatedAt
+            user {
+              id
+              name
+              email
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    rounds_in_id_order = {
+      rounds(:full) => [
+        selections(:full_adrian),
+        selections(:full_daniel),
+        selections(:full_chantel),
+        selections(:full_sarah),
+      ],
+      rounds(:empty) => [],
+    }
+
+    assert_equal(
+      {
+        "data" => {
+          "rounds" => rounds_in_id_order.map { |round, selections|
+            {
+              "id" => round.id.to_s,
+              "createdAt" => round.created_at.iso8601,
+              "updatedAt" => round.updated_at.iso8601,
+              "selections" => selections.map { |selection|
+                {
+                  "id" => selection.id.to_s,
+                  "createdAt" => selection.created_at.iso8601,
+                  "updatedAt" => selection.updated_at.iso8601,
+                  "user" => {
+                    "id" => selection.user.id.to_s,
+                    "name" => selection.user.name,
+                    "email" => selection.user.email,
+                    "createdAt" => selection.user.created_at.iso8601,
+                    "updatedAt" => selection.user.updated_at.iso8601,
+                  },
+                }
+              },
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+
+  test "rounds without users" do
+    query = <<~GRAPHQL
+      {
+        rounds {
+          id
+          selections {
+            id
+          }
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    rounds_in_id_order = {
+      rounds(:full) => [
+        selections(:full_adrian),
+        selections(:full_daniel),
+        selections(:full_chantel),
+        selections(:full_sarah),
+      ],
+      rounds(:empty) => [],
+    }
+
+    assert_equal(
+      {
+        "data" => {
+          "rounds" => rounds_in_id_order.map { |round, selections|
+            {
+              "id" => round.id.to_s,
+              "selections" => selections.map { |selection|
+                {
+                  "id" => selection.id.to_s,
+                }
+              },
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+
+  test "rounds without selections" do
+    query = <<~GRAPHQL
+      {
+        rounds {
+          id
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    rounds_in_id_order = [
+      rounds(:full),
+      rounds(:empty),
+    ]
+
+    assert_equal(
+      {
+        "data" => {
+          "rounds" => rounds_in_id_order.map { |round|
+            {
+              "id" => round.id.to_s,
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's run the tests again.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+Running 3 tests in a single process (parallelization threshold is 50)
+Run options: --seed 24874
+
+# Running:
+
+...
+
+Finished in 0.181486s, 16.5302 runs/s, 16.5302 assertions/s.
+3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+```
+
+We haven't changed any functionality so tests are still green. However, if you check the logs, you'll see that we're fetching selections and users from the database, regardless of whether we actually need them. Finally, here is the big payoff.
+
+Let's use our Lookahead.
+
+> `app/graphql/types/query_type.rb`
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
+    include GraphQL::Types::Relay::HasNodeField
+    include GraphQL::Types::Relay::HasNodesField
+
+    # Add root-level fields here.
+    # They will be entry points for queries on your schema.
+
+    field :rounds, [RoundType], null: false, extras: [:lookahead],
+      description: "List all rounds in creation order"
+
+    field :users, [Types::UserType], null: false,
+      description: "List all users in email order"
+
+    field :user, Types::UserType, "Find a user by ID", null: false do
+      argument :id, ID
+    end
+
+    def rounds(lookahead:)
+      inclusions = {}
+
+      if lookahead.selects?(:selections)
+        selection_inclusions = {}
+        if lookahead.selection(:selections).selects?(:user)
+          selection_inclusions[:user] = {}
+        end
+        inclusions[:selections] = selection_inclusions
+      end
+
+      Round.all.includes(inclusions).order(:id)
+    end
+
+    def users
+      User.all.order(:email)
+    end
+
+    def user(id:)
+      User.find(id)
+    end
+  end
+end
+```
+
+There's a bit going on here. First, `extras: [:lookahead]` makes `lookahead` available within our method. We can use that to check which selections the client has made. Be careful not to confuse `lookahead.selection` with the `selections` field on `RoundType`. Unfortunate naming for this guide. Understanding the rest just requires an understanding of the arguments that `includes` accepts. We have three options for the records we want to preload: nothing, just `selections`, both `selections` and `users`. The matching includes arguments are `{}`, `{selections:{}}`, and `{selections:{user:{}}}`, respectively. Another way this could have worked is with `nil`, `:selections`, and `selections: :user`. The last one should look familiar.
+
+Let's run the tests once more.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+Running 3 tests in a single process (parallelization threshold is 50)
+Run options: --seed 58569
+
+# Running:
+
+...
+
+Finished in 0.181383s, 16.5396 runs/s, 16.5396 assertions/s.
+3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Checking the logs should reveal that we're only selecting data when it's actually needed. For example, we only see `SELECT "users".* FROM "users" ...` when the `user` field is included in the GraphQL request.
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
