@@ -1,0 +1,169 @@
+---
+layout: default
+title:  "Chapter 11 - The Reaper"
+date:   2022-07-11 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want to delete a selection, so that I can make the user available again.
+```
+
+So far we've only created. Now it's time to destroy. Lucky for us this should be pretty simple, but let's think about possible issues. There might be a few things you need to consider when destroying an object and removing its row from the database. One thing might be asynchronous jobs. If you enqueue a job to send an email to a user and then that user is deleted soon after, you might have an issue when the job goes looking. Another major thing to think about is [foreign keys](https://www.postgresql.org/docs/current/tutorial-fk.html). We've used foreign keys in our application already. Databases will not let you delete a record if it is referenced by a foreign key. Luckily, we can delete records just fine if they're referencing another record. For us, we wouldn't be able to delete rounds or users without removing matching selections first. Of course, we can delete selection records at any time because they only point to rounds and users. In general, we perform true deletion sparingly. When records contain important historical data or are referenced by many foreign keys, I would look for an alternative. For example, instead of deleting users I would go with either a `state` or `archived_at` column instead. Here we really want to undo, so let's cause some destruction.
+
+Let's generate a new mutation.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:mutation_delete Selection
+      create  app/graphql/mutations/selection_delete.rb
+```
+
+Let's alphabetize our mutations.
+
+> `app/graphql/types/mutation_type.rb`
+
+```ruby
+module Types
+  class MutationType < Types::BaseObject
+    field :round_create, mutation: Mutations::RoundCreate
+    field :selection_create, mutation: Mutations::SelectionCreate
+    field :selection_delete, mutation: Mutations::SelectionDelete
+    field :user_create, mutation: Mutations::UserCreate
+  end
+end
+```
+
+Let's clean up our new mutation class.
+
+> `app/graphql/mutations/selection_delete.rb`
+
+```ruby
+module Mutations
+  class SelectionDelete < BaseMutation
+    description "Deletes a selection by ID"
+
+    field :selection, Types::SelectionType, null: false
+
+    argument :id, ID, required: true
+
+    def resolve(id:)
+      selection = Selection.find(id)
+      selection.destroy!
+      { selection: selection }
+    end
+  end
+end
+```
+
+Let's finally generate tests for our mutation.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/mutation_type/selection_delete
+      invoke  test_unit
+      create    test/integration/types/mutation_type/selection_delete_test.rb
+```
+
+Let's fill in the generated tests.
+
+> `test/integration/types/mutation_type/selection_delete_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::MutationType::SelectionDeleteTest < ActionDispatch::IntegrationTest
+  setup do
+    @query = <<~GRAPHQL
+      mutation SelectionDelete($id: ID!) {
+        selectionDelete(input: {
+          id: $id
+        }) {
+          selection {
+            id
+            createdAt
+            updatedAt
+            user {
+              id
+              name
+              email
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    GRAPHQL
+  end
+
+  test "selection_delete" do
+    selection = selections(:full_daniel)
+    variables = { id: selection.id }
+
+    assert_difference -> { Selection.count }, -1 do
+      post graphql_path, params: { query: @query, variables: variables }
+
+      assert_equal(
+        {
+          "data" => {
+            "selectionDelete" => {
+              "selection" => {
+                "id" => selection.id.to_s,
+                "createdAt" => selection.created_at.iso8601,
+                "updatedAt" => selection.updated_at.iso8601,
+                "user" => {
+                  "id" => selection.user.id.to_s,
+                  "name" => selection.user.name,
+                  "email" => selection.user.email,
+                  "createdAt" => selection.user.created_at.iso8601,
+                  "updatedAt" => selection.user.updated_at.iso8601,
+                },
+              },
+            },
+          },
+        },
+        @response.parsed_body
+      )
+
+      assert_nil Selection.find_by(id: selection.id)
+    end
+  end
+end
+```
+
+Let's run our new tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/mutation_type/selection_delete_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 6405
+
+# Running:
+
+.
+
+Finished in 0.158372s, 6.3142 runs/s, 18.9427 assertions/s.
+1 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to delete a selection, so that I can make the user available again.
+```
