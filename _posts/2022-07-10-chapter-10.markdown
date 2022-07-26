@@ -1,0 +1,364 @@
+---
+layout: default
+title:  "Chapter 10 - The Selection"
+date:   2022-07-10 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want to create a selection, so that we can have a host for the next All Hands.
+```
+
+This is why we're here - we're ready to select a user! Let's remind ourselves how the selection process should work. We will pick randomly from the pool of available engineers and mark the selection by creating a new selection record. Users are available for selection if they were created before this round was created and have not yet been selected for it.
+
+Let's generate our mutation.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:mutation_create Selection
+      create  app/graphql/mutations/selection_create.rb
+```
+
+Let's alphabetize our mutations.
+
+> `app/graphql/types/mutation_type.rb`
+
+```ruby
+module Types
+  class MutationType < Types::BaseObject
+    field :round_create, mutation: Mutations::RoundCreate
+    field :selection_create, mutation: Mutations::SelectionCreate
+    field :user_create, mutation: Mutations::UserCreate
+  end
+end
+```
+
+Let's clean up our new mutation class, keeping the input type this time.
+
+> `app/graphql/mutations/selection_create.rb`
+
+```ruby
+module Mutations
+  class SelectionCreate < BaseMutation
+    description "Creates a new selection"
+
+    field :selection, Types::SelectionType, null: false
+
+    argument :selection_input, Types::SelectionInputType, required: true
+
+    def resolve(selection_input:)
+      selection = Selection.create!(**selection_input)
+      { selection: selection }
+    end
+  end
+end
+```
+
+Let's generate our input type.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:input Selection
+      create  app/graphql/types/selection_input_type.rb
+```
+
+Let's remove every argument except `round_id` and make `round_id` required.
+
+> `app/graphql/types/selection_input_type.rb`
+
+```ruby
+module Types
+  class SelectionInputType < Types::BaseInputObject
+    argument :round_id, ID, required: true
+  end
+end
+```
+
+We're not accepting a `user_id` because we're going to handle that server-side. Often we will go right to the mutation, controller, or service and add the necessary logic. However, this might be a good use case for [Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html). When we create a selection, a user should be automatically selected. This sounds related to initialization, so let's use `after_initialize`. We have other options like `before_create`, but this choice works well. One last thing is that callbacks can seem very magical. It can feel weird to have properties change on their own. To many, making an explicit call to a method would feel better. I used to view Active Record objects as simple objects that acted as a bridge between my input and the database. Now I view them as objects that have full control over their own properties and life cycle. If I were using some external library or even using an external api, of course it would make complete sense that creating a `Selection` actually **makes** a selection, so why should it feel weird here?
+
+Let's add in our new selection logic.
+
+> `app/models/selection.rb`
+
+```ruby
+class Selection < ApplicationRecord
+  belongs_to :round
+  belongs_to :user
+
+  validates :user_id, uniqueness: { scope: :round_id }
+
+  after_initialize do |selection|
+    if selection.round.present? && selection.user.blank?
+      selection.user = round.available_users.sample
+    end
+  end
+end
+```
+
+Our additions to the `Selection` model should be pretty easy to follow. After initialization, we check to see if we need to select a user. If yes, we ask `round` for `available_users` and pick one at random using `sample`. Of course, to make this work we'll need `Round#available_users`.
+
+Let's add `available_users`.
+
+> `app/models/round.rb`
+
+```ruby
+class Round < ApplicationRecord
+  has_many :selections, -> { order(:id) }
+  has_many :users, through: :selections
+
+  def available_users
+    User.without(users)
+  end
+end
+```
+
+The body of the method retrieves all users except the ones that are already associated with this round. `users` is a new relation also added here. Now that we've defined how things should work, let's go through in reverse order and test them out. If something is broken, we can fix it before moving up to the next level.
+
+Let's add our test for `Round`.
+
+> `test/models/round_test.rb`
+
+```ruby
+require "test_helper"
+
+class RoundTest < ActiveSupport::TestCase
+  context "associations" do
+    should have_many(:selections).order(:id)
+    should have_many(:users).through(:selections)
+  end
+
+  context "#available_users" do
+    should "return all users when none have been selected" do
+      round = rounds(:empty)
+      assert_equal users.sort, round.available_users.sort
+    end
+
+    should "return no users when all have been selected" do
+      round = rounds(:full)
+      assert_equal [], round.available_users
+    end
+  end
+end
+```
+
+Let's run these tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/round_test.rb
+Running 4 tests in a single process (parallelization threshold is 50)
+Run options: --seed 61662
+
+# Running:
+
+....
+
+Finished in 0.117191s, 34.1323 runs/s, 34.1323 assertions/s.
+4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's add our test for `Selection`.
+
+> `test/models/selection_test.rb`
+
+```ruby
+require "test_helper"
+
+class SelectionTest < ActiveSupport::TestCase
+  context "associations" do
+    should belong_to(:round)
+    should belong_to(:user)
+  end
+
+  context "validations" do
+    should validate_uniqueness_of(:user_id).scoped_to(:round_id)
+  end
+
+  context "after initialize" do
+    should "select a random available user" do
+      round = rounds(:empty)
+      selection = Selection.new(round: round)
+      assert_includes users, selection.user
+    end
+
+    should "not select a user when round is not set" do
+      selection = Selection.new
+      assert_nil selection.user
+    end
+
+    should "not select a user when one has been set" do
+      round = rounds(:empty)
+      user = users(:daniel)
+      selection = Selection.new(round: round, user: user)
+      assert_equal user, selection.user
+    end
+
+    should "not select a user when all have been selected" do
+      round = rounds(:full)
+      selection = Selection.new(round: round)
+      assert_nil selection.user
+    end
+  end
+end
+```
+
+Let's run these tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/selection_test.rb
+Running 7 tests in a single process (parallelization threshold is 50)
+Run options: --seed 5916
+
+# Running:
+
+.......
+
+Finished in 0.158292s, 44.2221 runs/s, 50.5395 assertions/s.
+7 runs, 8 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Testing for true randomness can be difficult so we just wrote some pretty simple tests.
+
+Let's finally generate tests for our mutation.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/mutation_type/selection_create
+      invoke  test_unit
+      create    test/integration/types/mutation_type/selection_create_test.rb
+```
+
+Let's fill in the generated tests.
+
+> `test/integration/types/mutation_type/selection_create_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::MutationType::SelectionCreateTest < ActionDispatch::IntegrationTest
+  setup do
+    @query = <<~GRAPHQL
+      mutation SelectionCreate($roundId: ID!) {
+        selectionCreate(input: {
+          selectionInput: {
+            roundId: $roundId
+          }
+        }) {
+          selection {
+            id
+            createdAt
+            updatedAt
+            user {
+              id
+              name
+              email
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    GRAPHQL
+  end
+
+  test "selection_create" do
+    round = rounds(:empty)
+    variables = { roundId: round.id }
+
+    assert_difference -> { Selection.count } do
+      post graphql_path, params: { query: @query, variables: variables }
+
+      selection = Selection.last
+
+      assert_equal(
+        {
+          "data" => {
+            "selectionCreate" => {
+              "selection" => {
+                "id" => selection.id.to_s,
+                "createdAt" => selection.created_at.iso8601,
+                "updatedAt" => selection.updated_at.iso8601,
+                "user" => {
+                  "id" => selection.user.id.to_s,
+                  "name" => selection.user.name,
+                  "email" => selection.user.email,
+                  "createdAt" => selection.user.created_at.iso8601,
+                  "updatedAt" => selection.user.updated_at.iso8601,
+                },
+              },
+            },
+          },
+        },
+        @response.parsed_body
+      )
+    end
+  end
+
+  test "selection_create with errors" do
+    round = rounds(:full)
+    variables = { roundId: round.id }
+
+    assert_no_difference -> { Selection.count } do
+      post graphql_path, params: { query: @query, variables: variables }
+
+      assert_equal(
+        {
+          "data" => {
+            "selectionCreate" => nil,
+          },
+          "errors" => [
+            {
+              "message" => "Selection invalid",
+              "locations" => [{ "line" => 2, "column" => 3 }],
+              "path" => ["selectionCreate"],
+              "extensions" => { "user" => ["must exist"] },
+            },
+          ],
+        },
+        @response.parsed_body
+      )
+    end
+  end
+end
+```
+
+Let's run our new tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/mutation_type/selection_create_test.rb
+Running 2 tests in a single process (parallelization threshold is 50)
+Run options: --seed 6626
+
+# Running:
+
+..
+
+Finished in 0.150902s, 13.2536 runs/s, 26.5073 assertions/s.
+2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to create a selection, so that we can have a host for the next All Hands.
+```
