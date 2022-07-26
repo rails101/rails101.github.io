@@ -1,0 +1,264 @@
+---
+layout: default
+title:  "Chapter 7 - The History"
+date:   2022-07-07 00:00:00 0000
+categories: guide
+---
+
+To finish up our user story, we need to expose rounds through our API. We'll do that with a new root-level field named `rounds` and new types, `RoundType` and `SelectionType`. Most fields won't be noteworthy, except for two. We'll add a `selections` field to `RoundType` and a `user` field to `SelectionType`.
+
+Let's generate our `RoundType`.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:object Round selections:\[Selection\]
+      create  app/graphql/types/round_type.rb
+```
+
+Let's just make sure `selections` can't be `null`.
+
+> `app/graphql/types/round_type.rb`
+
+```ruby
+module Types
+  class RoundType < Types::BaseObject
+    field :id, ID, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :selections, [Types::SelectionType], null: false
+  end
+end
+```
+
+Let's generate our `SelectionType`.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:object Selection user:User
+      create  app/graphql/types/selection_type.rb
+```
+
+We'll make two changes to `SelectionType`. First we'll remove `round_id` and `user_id` since we'll want to leverage the graph instead of these particular ID fields. Second, we'll make sure `user` can't be `null`.
+
+Let's make those changes.
+
+> `app/graphql/types/selection_type.rb`
+
+```ruby
+module Types
+  class SelectionType < Types::BaseObject
+    field :id, ID, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :user, Types::UserType, null: false
+  end
+end
+```
+
+You might notice that `RoundType` has a `selections` field but the `Round` model doesn't have any method with that name. Before we fix that, let's talk about order. You might think that either the database or Rails will use a default sort order. You might even fetch some rows in the console and see results ordered by ID. That would be a coincidence. PostgreSQL does not actually guarantee row order, unless specified. Since we want results to be exact and consistent, we should alway specify. We could do this by adding a custom `selections` method on `RoundType`, but I would rather avoid custom methods on model types. The approach we'll take is to set the order when declaring the relation.
+
+Let's add the relation.
+
+> `app/models/round.rb`
+
+```ruby
+class Round < ApplicationRecord
+  has_many :selections, -> { order(:id) }
+end
+```
+
+Let's add a test.
+
+> `test/models/round_test.rb`
+
+```ruby
+require "test_helper"
+
+class RoundTest < ActiveSupport::TestCase
+  context "associations" do
+    should have_many(:selections).order(:id)
+  end
+end
+```
+
+Let's run our new test.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/round_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 1951
+
+# Running:
+
+.
+
+Finished in 0.051161s, 19.5461 runs/s, 19.5461 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Now we're ready to add our `rounds` field. You might be tempted to just write `Round.all`. I see it often, but we want results to be exact and consistent so we will use `Round.all.order(:id)`.
+
+Let's add our new field.
+
+> `app/graphql/types/query_type.rb`
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
+    include GraphQL::Types::Relay::HasNodeField
+    include GraphQL::Types::Relay::HasNodesField
+
+    # Add root-level fields here.
+    # They will be entry points for queries on your schema.
+
+    field :rounds, [RoundType], null: false,
+      description: "List all rounds in creation order"
+
+    field :users, [Types::UserType], null: false,
+      description: "List all users in email order"
+
+    field :user, Types::UserType, "Find a user by ID", null: false do
+      argument :id, ID
+    end
+
+    def rounds
+      Round.all.order(:id)
+    end
+
+    def users
+      User.all.order(:email)
+    end
+
+    def user(id:)
+      User.find(id)
+    end
+  end
+end
+```
+
+You might be wondering how we can write exact and consistent tests when our fixtures do not specify IDs. We could specify IDs for all of our fixtures, but [Rails will actually generate consistent IDs based on the fixture's label](https://api.rubyonrails.org/v7.0.3/classes/ActiveRecord/FixtureSet.html). Armed with this knowledge, we can spy on the ordering using something like `Selection.all.order(:id).map { |s| s.user.name }`.
+
+Let's generate a test for our new field.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/query_type/rounds
+      invoke  test_unit
+      create    test/integration/types/query_type/rounds_test.rb
+```
+
+Let's fill in the generated test.
+
+> `test/integration/types/query_type/rounds_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
+  test "rounds" do
+    query = <<~GRAPHQL
+      {
+        rounds {
+          id
+          createdAt
+          updatedAt
+          selections {
+            id
+            createdAt
+            updatedAt
+            user {
+              id
+              name
+              email
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    rounds_in_id_order = {
+      rounds(:full) => [
+        selections(:full_adrian),
+        selections(:full_daniel),
+        selections(:full_chantel),
+        selections(:full_sarah),
+      ],
+      rounds(:empty) => [],
+    }
+
+    assert_equal(
+      {
+        "data" => {
+          "rounds" => rounds_in_id_order.map { |round, selections|
+            {
+              "id" => round.id.to_s,
+              "createdAt" => round.created_at.iso8601,
+              "updatedAt" => round.updated_at.iso8601,
+              "selections" => selections.map { |selection|
+                {
+                  "id" => selection.id.to_s,
+                  "createdAt" => selection.created_at.iso8601,
+                  "updatedAt" => selection.updated_at.iso8601,
+                  "user" => {
+                    "id" => selection.user.id.to_s,
+                    "name" => selection.user.name,
+                    "email" => selection.user.email,
+                    "createdAt" => selection.user.created_at.iso8601,
+                    "updatedAt" => selection.user.updated_at.iso8601,
+                  },
+                }
+              },
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's run our new tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/rounds_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 48796
+
+# Running:
+
+.
+
+Finished in 0.157249s, 6.3593 runs/s, 6.3593 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to see all rounds and selections, so that I can see selection history.
+```
