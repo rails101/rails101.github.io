@@ -1,0 +1,138 @@
+---
+layout: default
+title:  "Chapter 9 - The Kickoff"
+date:   2022-07-09 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As as app user, I want to create a new round, so that I can start the selection process.
+```
+
+We know that we create records through mutations and we've covered the topic before so this should be quick.
+
+Let's generate our mutation.
+
+> **Terminal**
+
+```bash
+$ bin/rails g graphql:mutation_create Round
+      create  app/graphql/mutations/round_create.rb
+```
+
+A mutation class named `Mutations::RoundCreate` is generated for us and a `round_create` field is added to `Types::MutationType`. We won't need to make any changes to `app/graphql/types/mutation_type.rb` so let's look at `app/graphql/mutations/round_create.rb`. We won't need `round_input` so we'll remove that. We've already got some generic error handling set up so we'll use `create!` again, instead of `save`. We're not anticipating any failures here anyway, but if it happens we'll catch it.
+
+Let's make those changes.
+
+> `app/graphql/mutations/round_create.rb`
+
+```ruby
+module Mutations
+  class RoundCreate < BaseMutation
+    description "Creates a new round"
+
+    field :round, Types::RoundType, null: false
+
+    def resolve
+      round = Round.create!
+      { round: round }
+    end
+  end
+end
+```
+
+Let's generate our tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails g integration_test types/mutation_type/round_create
+      invoke  test_unit
+      create    test/integration/types/mutation_type/round_create_test.rb
+```
+
+Let's fill in the generated tests.
+
+> `test/integration/types/mutation_type/round_create_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::MutationType::RoundCreateTest < ActionDispatch::IntegrationTest
+  setup do
+    @query = <<~GRAPHQL
+      mutation RoundCreate {
+        roundCreate(input: {}) {
+          round {
+            id
+            createdAt
+            updatedAt
+            selections {
+              id
+            }
+          }
+        }
+      }
+    GRAPHQL
+  end
+
+  test "round_create" do
+    assert_difference -> { Round.count } do
+      post graphql_path, params: { query: @query }
+
+      round = Round.last
+
+      assert_equal(
+        {
+          "data" => {
+            "roundCreate" => {
+              "round" => {
+                "id" => round.id.to_s,
+                "createdAt" => round.created_at.iso8601,
+                "updatedAt" => round.updated_at.iso8601,
+                "selections" => [],
+              },
+            },
+          },
+        },
+        @response.parsed_body
+      )
+    end
+  end
+end
+```
+
+Let's run our new test.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/mutation_type/round_create_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 26820
+
+# Running:
+
+.
+
+Finished in 0.149116s, 6.7062 runs/s, 13.4124 assertions/s.
+1 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As as app user, I want to create a new round, so that I can start the selection process.
+```
