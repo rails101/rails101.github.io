@@ -1,0 +1,280 @@
+---
+layout: default
+title:  "Chapter 12 - The Archive"
+date:   2022-07-12 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want to see the archived status of users, so that I can know who is available.
+```
+
+Up until now we've assumed that users will be around forever, but there are many reasons why we'd want to archive a user. For this we'll need to store someone's archived status. Some options are a string/integer/enum field named `state`, a timestamp field named `archived_at`, or a boolean field named `archived`. `state` may be a great choice when there are multiple states required. `archived_at` would be useful as well because not only does a timestamp tell you whether a flag has been set, it tells you when. For our app, though, we don't anticipate any further state complexity or timestamp requirements. Let's just go with the simplest and smallest of the three, a boolean field named `archived`.
+
+Let's start by generating a migration for our new column.
+
+> **Terminal**
+
+```bash
+$ bin/rails g migration AddArchivedToUser archived:boolean
+      invoke  active_record
+      create    db/migrate/20220727154853_add_archived_to_user.rb
+```
+
+We'll make a couple additions to the migration. First, we'll add a not-null constraint. That will help us [Avoid the Three-state Boolean Problem](https://thoughtbot.com/blog/avoid-the-threestate-boolean-problem). Second, we'll add a default value. PostgreSQL will use the default for any existing columns. Keep in mind that this can be dangerous with a large number of existing rows. We don't have to worry about that yet. The default will also be used for any new instances of `User` where `archived` is not specified.
+
+Let's make our changes to the migration.
+
+> `db/migrate/[timestamp]_add_archived_to_user.rb`
+
+```ruby
+class AddArchivedToUser < ActiveRecord::Migration[7.0]
+  def change
+    add_column :users, :archived, :boolean, null: false, default: false
+  end
+end
+```
+
+Let's run our migration.
+
+> **Terminal**
+
+```bash
+$ bin/rails db:migrate
+== 20220727154853 AddArchivedToUser: migrating ================================
+-- add_column(:users, :archived, :boolean, {:null=>false, :default=>false})
+   -> 0.0089s
+== 20220727154853 AddArchivedToUser: migrated (0.0090s) =======================
+```
+
+Let's add a validation for our new column.
+
+> `app/models/user.rb`
+
+```ruby
+class User < ApplicationRecord
+  validates :name, :email, presence: true
+  validates :email, uniqueness: { case_sensitive: false }
+  validates :archived, exclusion: [nil]
+end
+```
+
+Let's test our changes.
+
+> `test/models/user_test.rb`
+
+```ruby
+require "test_helper"
+
+class UserTest < ActiveSupport::TestCase
+  context "validations" do
+    should validate_presence_of(:name)
+    should validate_presence_of(:email)
+    should validate_uniqueness_of(:email).case_insensitive
+    should validate_exclusion_of(:archived).in_array([nil])
+  end
+end
+```
+
+Let's run our tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/user_test.rb
+Running 4 tests in a single process (parallelization threshold is 50)
+Run options: --seed 7804
+
+# Running:
+
+....
+
+Finished in 0.077718s, 51.4681 runs/s, 51.4681 assertions/s.
+4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's expose our new field to the API.
+
+> `app/graphql/types/user_type.rb`
+
+```ruby
+module Types
+  class UserType < Types::BaseObject
+    field :id, ID, null: false
+    field :name, String, null: false
+    field :email, String, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :archived, Boolean, null: false
+  end
+end
+```
+
+Let's add the new field to relevant tests.
+
+> `test/integration/types/query_type/user_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UserTest < ActionDispatch::IntegrationTest
+  setup do
+    @query = <<~GRAPHQL
+      query User($id: ID!) {
+        user(id: $id) {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+          archived
+        }
+      }
+    GRAPHQL
+  end
+
+  test "user" do
+    user = users(:daniel)
+
+    post graphql_path, params: { query: @query, variables: { id: user.id } }
+
+    assert_equal(
+      {
+        "data" => {
+          "user" => {
+            "id" => user.id.to_s,
+            "name" => user.name,
+            "email" => user.email,
+            "createdAt" => user.created_at.iso8601,
+            "updatedAt" => user.updated_at.iso8601,
+            "archived" => user.archived,
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+
+  test "user not found" do
+    post graphql_path, params: { query: @query, variables: { id: "0" } }
+
+    assert_equal(
+      {
+        "data" => nil,
+        "errors" => [
+          {
+            "message" => "User not found",
+            "locations" => [{ "line" => 2, "column" => 3 }],
+            "path" => ["user"],
+          },
+        ],
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's run the tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/user_test.rb
+Running 2 tests in a single process (parallelization threshold is 50)
+Run options: --seed 46724
+
+# Running:
+
+..
+
+Finished in 0.136307s, 14.6728 runs/s, 14.6728 assertions/s.
+2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's add the new field to one more test.
+
+> `test/integration/types/query_type/users_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UsersTest < ActionDispatch::IntegrationTest
+  test "users" do
+    query = <<~GRAPHQL
+      {
+        users {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+          archived
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    users_in_email_order = [
+      users(:adrian),
+      users(:chantel),
+      users(:daniel),
+      users(:sarah),
+    ]
+
+    assert_equal(
+      {
+        "data" => {
+          "users" => users_in_email_order.map { |user|
+            {
+              "id" => user.id.to_s,
+              "name" => user.name,
+              "email" => user.email,
+              "createdAt" => user.created_at.iso8601,
+              "updatedAt" => user.updated_at.iso8601,
+              "archived" => user.archived,
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's run the tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/users_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 54933
+
+# Running:
+
+.
+
+Finished in 0.160506s, 6.2303 runs/s, 6.2303 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to see the archived status of users, so that I can know who is available.
+```
