@@ -1,0 +1,307 @@
+---
+layout: default
+title:  "Chapter 15 - The Index"
+date:   2022-07-15 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
+```
+
+Our application was stable and working well, but our company has recently seen massive growth and thus the number of users in our production database has increased massively. This is great news, but now we're seeing some new issues at scale. To simulate this scale, we'll add some users to our development database. If you've been testing manually, this will cause the `users` root-level field to take a very long time to respond or not respond at all. The first thing we'll want to do is limit the number of records that can be retrieved at once. For the sake of brevity, arguments, pagination logic, and tests are left as an excercise for the reader. We'll just hardcode a typical Active Record query chain for now.
+
+Let's add a filter, order, and limit to our field.
+
+> `app/graphql/types/query_type.rb` (lines omitted)
+
+```ruby
+module Types
+  class QueryType < Types::BaseObject
+    # ...
+
+    def users
+      User.unarchived.order(:name).limit(100)
+    end
+
+    # ...
+  end
+end
+```
+
+Let's start the rails console.
+
+> **Terminal**
+
+```bash
+$ bin/rails c
+Loading development environment (Rails 7.0.3.1)
+irb(main):001:0>
+```
+
+Let's add a million users with random data.
+
+> **Rails Console** (output omitted)
+
+```ruby
+> def random_attributes
+  {
+    name: SecureRandom.alphanumeric,
+    email: "#{SecureRandom.alphanumeric}@example.com",
+    archived: (rand > 0.1),
+  }
+end
+1000.times do
+  User.insert_all(1000.times.map { random_attributes })
+end
+ActiveRecord::Base.connection.exec_query("VACUUM ANALYZE")
+```
+
+With this you'll have at least 1 million users in your database with about a 10% chance of being unarchived. With such a big table, we need to think about what new indexes, if any, will help us. We already know what we're trying to optimize, `User.unarchived.order(:name).limit(100)`. To judge the effectiveness, we'll be using [EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html) to check query plans. We'll also check some internal data provided by PostgreSQL.
+
+Let's see the baseline query plan.
+
+> **Rails Console**
+
+```ruby
+> User.unarchived.order(:name).limit(100).explain
+  User Load (221.9ms)  SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2  [["archived", false], ["LIMIT", 100]]
+=>
+EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2 [["archived", false], ["LIMIT", 100]]
+                                       QUERY PLAN
+-----------------------------------------------------------------------------------------
+ Limit  (cost=20075.13..20086.80 rows=100 width=71)
+   ->  Gather Merge  (cost=20075.13..29687.97 rows=82390 width=71)
+         Workers Planned: 2
+         ->  Sort  (cost=19075.11..19178.10 rows=41195 width=71)
+               Sort Key: name
+               ->  Parallel Seq Scan on users  (cost=0.00..17500.67 rows=41195 width=71)
+                     Filter: (NOT archived)
+```
+
+Let's see the baseline index size.
+
+> **Rails Console**
+
+```ruby
+> ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
+  SQL (2.1ms)  SELECT pg_size_pretty (pg_indexes_size('users'))
+=> {"pg_size_pretty"=>"84 MB"}
+```
+
+We've gotten some pretty good information here. First, in the query plan we can see a breakdown of steps with descriptions that should at least sound familiar. We're mostly interested in the rightmost cost of the topmost line. We can see that we're at about 20,000 right now. Your machine may be slightly different. To improve things, let's try some indexes. First, we'll add a pretty basic multicolumn index on `archived` and `name`.
+
+Let's generate our migration.
+
+> **Terminal**
+
+```bash
+$ bin/rails g migration AddIndexToUsersOnArchivedName
+      invoke  active_record
+      create    db/migrate/20220728212208_add_index_to_users_on_archived_name.rb
+```
+
+Let's fill in our new migration.
+
+> `db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
+
+```ruby
+class AddIndexToUsersOnArchivedName < ActiveRecord::Migration[7.0]
+  def change
+    add_index :users, [:archived, :name]
+  end
+end
+```
+
+Let's run our migration.
+
+> **Terminal**
+
+```bash
+$ bin/rails db:migrate
+== 20220728212208 AddIndexToUsersOnArchivedName: migrating ====================
+-- add_index(:users, [:archived, :name])
+   -> 1.8285s
+== 20220728212208 AddIndexToUsersOnArchivedName: migrated (1.8286s) ===========
+```
+
+Let's see how our new index affects the query plan.
+
+> **Rails Console**
+
+```ruby
+> User.unarchived.order(:name).limit(100).explain
+  User Load (18.8ms)  SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2  [["archived", false], ["LIMIT", 100]]
+=>
+EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2 [["archived", false], ["LIMIT", 100]]
+                                                 QUERY PLAN
+-------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.42..37.89 rows=100 width=71)
+   ->  Index Scan using index_users_on_archived_and_name on users  (cost=0.42..37037.45 rows=98867 width=71)
+         Index Cond: (archived = false)
+(3 rows)
+```
+
+Let's see our new index size.
+
+> **Rails Console**
+
+```ruby
+> ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
+  SQL (0.6ms)  SELECT pg_size_pretty (pg_indexes_size('users'))
+=> {"pg_size_pretty"=>"123 MB"}
+```
+
+Saying this performs better would be quite the understatement. The cost, at around 38, is a fraction of our previous cost. All the database needs to do is walk the index and stop at 100 rows, hence the term "index scan." It does come at a price. Every index you add will take up space, but at 39 MB this is more than worth it. Next, we'll try a partial index. The benefit of partial indexes is that not all records are indexed. This is great when you're usually only interested in a subset of your table. For us, that subset will be unarchived users.
+
+Let's rollback.
+
+> **Terminal**
+
+```bash
+$ bin/rails db:rollback
+== 20220728212208 AddIndexToUsersOnArchivedName: reverting ====================
+-- remove_index(:users, [:archived, :name])
+   -> 0.0060s
+== 20220728212208 AddIndexToUsersOnArchivedName: reverted (0.0125s) ===========
+```
+
+Let's update our new migration with a partial index.
+
+> `db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
+
+```ruby
+class AddIndexToUsersOnArchivedName < ActiveRecord::Migration[7.0]
+  def change
+    add_index :users, :name, where: "NOT archived",
+      name: "index_users_on_name_where_not_archived"
+  end
+end
+```
+
+Let's run our migration.
+
+> **Terminal**
+
+```bash
+$ bin/rails db:migrate
+== 20220728212208 AddIndexToUsersOnArchivedName: migrating ====================
+-- add_index(:users, :name, {:where=>"NOT archived", :name=>"index_users_on_name_where_not_archived"})
+   -> 0.3492s
+== 20220728212208 AddIndexToUsersOnArchivedName: migrated (0.3493s) ===========
+```
+
+Let's see how our this index affects the query plan.
+
+> **Rails Console**
+
+```ruby
+> User.unarchived.order(:name).limit(100).explain
+  User Load (4.2ms)  SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2  [["archived", false], ["LIMIT", 100]]
+=>
+EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER BY "users"."name" ASC LIMIT $2 [["archived", false], ["LIMIT", 100]]
+                                                    QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.42..57.86 rows=100 width=71)
+   ->  Index Scan using index_users_on_name_where_not_archived on users  (cost=0.42..56794.51 rows=98867 width=71)
+(2 rows)
+```
+
+Let's see our new index size.
+
+> **Rails Console**
+
+```ruby
+> ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
+  SQL (0.6ms)  SELECT pg_size_pretty (pg_indexes_size('users'))
+=> {"pg_size_pretty"=>"88 MB"}
+```
+
+It's no surprise that, at 58, we see huge cost savings with this query plan as well. As expected, we'll simply perform another index scan. Looking at the total size of our indexes, we see that this index has a much smaller footprint, adding just 4 MB. Partial indexes really shine when you're only concerned about small subsets of the table, possibly from many different queries. In this particular case, it would take 10 partial indexes of similar size to match the size of our previous index. No two situations are alike, so when in doubt check the numbers.
+
+Let's update the test for this field.
+
+> `test/integration/types/query_type/users_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UsersTest < ActionDispatch::IntegrationTest
+  test "users" do
+    query = <<~GRAPHQL
+      {
+        users {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+          archived
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    users_in_email_order = [
+      users(:adrian),
+      users(:chantel),
+      users(:daniel),
+      users(:sarah),
+    ]
+
+    assert_equal(
+      {
+        "data" => {
+          "users" => users_in_email_order.map { |user|
+            {
+              "id" => user.id.to_s,
+              "name" => user.name,
+              "email" => user.email,
+              "createdAt" => user.created_at.iso8601,
+              "updatedAt" => user.updated_at.iso8601,
+              "archived" => user.archived,
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's run our tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/integration/types/query_type/users_test.rb
+Running 1 tests in a single process (parallelization threshold is 50)
+Run options: --seed 33717
+
+# Running:
+
+.
+
+Finished in 0.167782s, 5.9601 runs/s, 5.9601 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
+```
