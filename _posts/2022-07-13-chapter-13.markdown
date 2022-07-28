@@ -1,0 +1,341 @@
+---
+layout: default
+title:  "Chapter 13 - The Filter"
+date:   2022-07-13 00:00:00 0000
+categories: guide
+---
+
+```
+📝 As an app user, I want archived users not to be selected, so that we always have a valid host.
+```
+
+Now that we have the `archived` column working we need to put it to use.
+
+Let's add some archived users to our fixtures to help with testing.
+
+> `test/fixtures/users.yml`
+
+```yaml
+sarah:
+  name: Sarah Fleming
+  email: sarah@example.com
+
+chantel:
+  name: Chantel Miller
+  email: chantel@example.com
+
+adrian:
+  name: Adrian Lee
+  email: adrian@example.com
+
+daniel:
+  name: Daniel Bryant
+  email: daniel@example.com
+
+casper:
+  name: Casper
+  email: casper@example.com
+  archived: true
+
+stretch:
+  name: Stretch
+  email: stretch@example.com
+  archived: true
+
+fatso:
+  name: Fatso
+  email: fatso@example.com
+  archived: true
+
+stinkie:
+  name: Stinkie
+  email: stinkie@example.com
+  archived: true
+```
+
+We know that we're dealing with selections, so a good place to start is our `Selection` model. After quickly reminding ourselves of the logic in `after_initialize`, our eyes zero in on `round.available_users.sample`. We'll need to refactor `Round#available_users` so that it does not return archived users. Continuing this process, we'll push down into our models until we've made adequate changes. Then we'll pop back up, testing each layer. We won't need any changes to `Selection`, but we should still add to the test.
+
+Let's refactor `Round#available_users` to not return archived users.
+
+> `app/models/round.rb`
+
+```ruby
+class Round < ApplicationRecord
+  has_many :selections, -> { order(:id) }
+  has_many :users, through: :selections
+
+  def available_users
+    User.unarchived.without(users)
+  end
+end
+```
+
+Let's add the missing `User.unarchived` method in the form of a scope.
+
+> `app/models/user.rb`
+
+```ruby
+class User < ApplicationRecord
+  validates :name, :email, presence: true
+  validates :email, uniqueness: { case_sensitive: false }
+  validates :archived, exclusion: [nil]
+
+  scope :unarchived, -> { where(archived: false) }
+end
+```
+
+Let's add tests for `User.unarchived`.
+
+> `test/models/user_test.rb`
+
+```ruby
+require "test_helper"
+
+class UserTest < ActiveSupport::TestCase
+  context "validations" do
+    should validate_presence_of(:name)
+    should validate_presence_of(:email)
+    should validate_uniqueness_of(:email).case_insensitive
+    should validate_exclusion_of(:archived).in_array([nil])
+  end
+
+  test ".unarchived" do
+    unarchived_users = [
+      users(:sarah),
+      users(:chantel),
+      users(:adrian),
+      users(:daniel),
+    ]
+
+    assert_equal unarchived_users.sort, User.unarchived.sort
+  end
+end
+```
+
+Let's run our tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/user_test.rb
+Running 5 tests in a single process (parallelization threshold is 50)
+Run options: --seed 39806
+
+# Running:
+
+.....
+
+Finished in 0.101266s, 49.3749 runs/s, 49.3749 assertions/s.
+5 runs, 5 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's add tests for `Round#available_users`.
+
+> `test/models/round_test.rb`
+
+```ruby
+require "test_helper"
+
+class RoundTest < ActiveSupport::TestCase
+  context "associations" do
+    should have_many(:selections).order(:id)
+    should have_many(:users).through(:selections)
+  end
+
+  context "#available_users" do
+    should "return all available users when none have been selected" do
+      available_users = [
+        users(:sarah),
+        users(:chantel),
+        users(:adrian),
+        users(:daniel),
+      ]
+
+      round = rounds(:empty)
+      assert_equal available_users.sort, round.available_users.sort
+    end
+
+    should "return no users when all available have been selected" do
+      round = rounds(:full)
+      assert_equal [], round.available_users
+    end
+  end
+end
+```
+
+Let's run our tests.
+
+> **Terminal**
+
+```bash
+Running 4 tests in a single process (parallelization threshold is 50)
+Run options: --seed 39956
+
+# Running:
+
+....
+
+Finished in 0.072143s, 55.4454 runs/s, 55.4454 assertions/s.
+4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's finish up with our selection tests.
+
+> `test/models/selection_test.rb`
+
+```ruby
+require "test_helper"
+
+class SelectionTest < ActiveSupport::TestCase
+  context "associations" do
+    should belong_to(:round)
+    should belong_to(:user)
+  end
+
+  context "validations" do
+    should validate_uniqueness_of(:user_id).scoped_to(:round_id)
+  end
+
+  context "after initialize" do
+    should "select a random available user" do
+      available_users = [
+        users(:sarah),
+        users(:chantel),
+        users(:adrian),
+        users(:daniel),
+      ]
+
+      unavailable_users = [
+        users(:casper),
+        users(:stretch),
+        users(:fatso),
+        users(:stinkie),
+      ]
+
+      round = rounds(:empty)
+      selection = Selection.new(round: round)
+      assert_includes available_users, selection.user
+      assert_not_includes unavailable_users, selection.user
+    end
+
+    should "not select a user when round is not set" do
+      selection = Selection.new
+      assert_nil selection.user
+    end
+
+    should "not select a user when one has been set" do
+      round = rounds(:empty)
+      user = users(:daniel)
+      selection = Selection.new(round: round, user: user)
+      assert_equal user, selection.user
+    end
+
+    should "not select a user when all have been selected" do
+      round = rounds(:full)
+      selection = Selection.new(round: round)
+      assert_nil selection.user
+    end
+  end
+end
+```
+
+Let's run our tests.
+
+> **Terminal**
+
+```bash
+$ bin/rails t test/models/selection_test.rb
+Running 7 tests in a single process (parallelization threshold is 50)
+Run options: --seed 14374
+
+# Running:
+
+.......
+
+Finished in 0.099506s, 70.3475 runs/s, 100.4965 assertions/s.
+7 runs, 10 assertions, 0 failures, 0 errors, 0 skips
+```
+
+Let's also make sure we don't have any regressions by running all of our tests.
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Uh oh! Our `users` query is returning more data than our test is expecting because of the new fixtures. Easy fix.
+
+Let's update our test.
+
+> `test/integration/types/query_type/users_test.rb`
+
+```ruby
+require "test_helper"
+
+class Types::QueryType::UsersTest < ActionDispatch::IntegrationTest
+  test "users" do
+    query = <<~GRAPHQL
+      {
+        users {
+          id
+          name
+          email
+          createdAt
+          updatedAt
+          archived
+        }
+      }
+    GRAPHQL
+
+    post graphql_path, params: { query: query }
+
+    users_in_email_order = [
+      users(:adrian),
+      users(:casper),
+      users(:chantel),
+      users(:daniel),
+      users(:fatso),
+      users(:sarah),
+      users(:stinkie),
+      users(:stretch),
+    ]
+
+    assert_equal(
+      {
+        "data" => {
+          "users" => users_in_email_order.map { |user|
+            {
+              "id" => user.id.to_s,
+              "name" => user.name,
+              "email" => user.email,
+              "createdAt" => user.created_at.iso8601,
+              "updatedAt" => user.updated_at.iso8601,
+              "archived" => user.archived,
+            }
+          },
+        },
+      },
+      @response.parsed_body
+    )
+  end
+end
+```
+
+Let's also make sure we don't have any regressions by running all of our tests (again).
+
+> **Terminal** (output omitted)
+
+```bash
+$ bin/rails t
+```
+
+Success!
+
+```
+✅ Make a commit
+```
+
+```
+✅ As an app user, I want archived users not to be selected, so that we always have a valid host.
+```
