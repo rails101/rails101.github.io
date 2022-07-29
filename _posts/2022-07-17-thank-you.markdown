@@ -1,0 +1,8 @@
+---
+layout: default
+title:  "Thank You"
+date:   2022-07-17 00:00:00 0000
+categories: guide
+---
+
+I hope you've enjoyed reading and working through this guide as much as I enjoyed writing it. Go forth and code.
