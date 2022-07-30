@@ -5,6 +5,8 @@ date:   2022-07-02 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 The first thing you'll notice about this guide is that I'll take your through [vertical slices](https://en.wikipedia.org/wiki/Vertical_slice) of the application. It's my preferred approach and I think it works well with Rails especially. This means that, in contrast to documentation, some areas of the application will be split between chapters. In other words, don't expect to build every model right now. To start off, we'll build a `User` model with `name` and `email` attributes. We'll offload as much work as possible to the generator.
 
 Let's get an idea of what the generator can do.
@@ -177,3 +179,5 @@ Success!
 ```
 ✅ Make a commit
 ```
+
+{% include next-link.markdown %}

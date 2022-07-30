@@ -5,4 +5,8 @@ date:   2022-07-17 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 I hope you've enjoyed reading and working through this guide as much as I enjoyed writing it. Go forth and code.
+
+{% include next-link.markdown %}

@@ -5,6 +5,8 @@ date:   2022-07-01 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 For our "Engineering All Hands" meetings at Hipcamp, we have someone new run it every week. That person is picked at random using some manual process. Let's make a web app to do that for us. Make sure you have recent versions of [Ruby](https://www.ruby-lang.org/en/), [Ruby on Rails](https://rubyonrails.org/), and [PostgreSQL](https://www.postgresql.org/) installed. Installation is outside the scope of this guide, but if you're on macOS you can use [Homebrew](https://brew.sh/) and [rbenv](https://github.com/rbenv/rbenv) to help with installation and versioning.
 
 Let's check our versions.
@@ -68,3 +70,5 @@ Finally, refresh the page and you'll see a Rails welcome screen. In your project
 ```
 ✅ Make a commit
 ```
+
+{% include next-link.markdown %}

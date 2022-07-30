@@ -5,6 +5,8 @@ date:   2022-07-11 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 ```
 📝 As an app user, I want to delete a selection, so that I can make the user available again.
 ```
@@ -167,3 +169,5 @@ Success!
 ```
 ✅ As an app user, I want to delete a selection, so that I can make the user available again.
 ```
+
+{% include next-link.markdown %}

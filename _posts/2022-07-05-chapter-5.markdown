@@ -5,6 +5,8 @@ date:   2022-07-05 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 ```
 📝 As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
 ```
@@ -240,3 +242,5 @@ Success!
 ```
 ✅ As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
 ```
+
+{% include next-link.markdown %}

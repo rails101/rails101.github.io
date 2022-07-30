@@ -5,6 +5,8 @@ date:   2022-07-08 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 What we have works, but something stands out. Whenever we're requesting records through one or more levels of `has_many`, we should be on the lookout for N+1 queries. These issues are hard to write automated tests for, but very easy to spot with the naked eye. Since we are potentially requesting multiple levels of records in `rounds`, let's see if we have some bad queries lurking.
 
 Let's start tailing our test logs.
@@ -385,3 +387,5 @@ Success!
 ```
 ✅ Make a commit
 ```
+
+{% include next-link.markdown %}

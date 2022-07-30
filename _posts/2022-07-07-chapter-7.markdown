@@ -5,6 +5,8 @@ date:   2022-07-07 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 To finish up our user story, we need to expose rounds through our API. We'll do that with a new root-level field named `rounds` and new types, `RoundType` and `SelectionType`. Most fields won't be noteworthy, except for two. We'll add a `selections` field to `RoundType` and a `user` field to `SelectionType`.
 
 Let's generate our `RoundType`.
@@ -262,3 +264,5 @@ Success!
 ```
 ✅ As an app user, I want to see all rounds and selections, so that I can see selection history.
 ```
+
+{% include next-link.markdown %}
