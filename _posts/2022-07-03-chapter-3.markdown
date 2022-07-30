@@ -5,6 +5,8 @@ date:   2022-07-03 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 Before we continue with the what, let's think about the why. In this guide, we'll use [users stories](https://en.wikipedia.org/wiki/User_story) to guide the work that we do. Writing user stories is a best practice for feature work. Things like bug fixes and technical cleanup may not fit into this model.
 
 Let's start with our first user story.
@@ -181,3 +183,5 @@ Success!
 ```
 ✅ As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
 ```
+
+{% include next-link.markdown %}

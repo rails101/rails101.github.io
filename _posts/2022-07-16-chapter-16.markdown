@@ -5,6 +5,8 @@ date:   2022-07-16 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 ```
 📝 As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
 ```
@@ -216,3 +218,5 @@ This might run in about the same amount of time as before, but this time our upd
 ```
 ✅ As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
 ```
+
+{% include next-link.markdown %}

@@ -5,6 +5,8 @@ date:   2022-07-06 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 ```
 📝 As an app user, I want to see all rounds and selections, so that I can see selection history.
 ```
@@ -183,3 +185,5 @@ Success!
 ```
 ✅ Make a commit
 ```
+
+{% include next-link.markdown %}

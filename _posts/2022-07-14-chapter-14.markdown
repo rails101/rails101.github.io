@@ -5,6 +5,8 @@ date:   2022-07-14 00:00:00 0000
 categories: guide
 ---
 
+{% include previous-link.markdown %}
+
 ```
 📝 As an app user, I want to archive a user, so that they are removed from the selection process.
 ```
@@ -189,3 +191,5 @@ Success!
 ```
 ✅ As an app user, I want to archive a user, so that they are removed from the selection process.
 ```
+
+{% include next-link.markdown %}
