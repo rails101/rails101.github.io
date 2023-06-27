@@ -9,7 +9,7 @@ categories: guide
 
 The first thing you'll notice about this guide is that I'll take your through [vertical slices](https://en.wikipedia.org/wiki/Vertical_slice) of the application. It's my preferred approach and I think it works well with Rails especially. This means that, in contrast to documentation, some areas of the application will be split between chapters. In other words, don't expect to build every model right now. To start off, we'll build a `User` model with `name` and `email` attributes. We'll offload as much work as possible to the generator.
 
-Let's get an idea of what the generator can do.
+Check out documentation for the `generate model` command.
 
 `Terminal` (output omitted)
 
@@ -19,7 +19,7 @@ $ bin/rails generate model
 
 Skim through the output to see the available options.
 
-Let's generate our model.
+Generate a `User` model.
 
 `Terminal`
 
@@ -37,7 +37,7 @@ Take a look at what was generated for you. We're off to a great start just by le
 
 We'll still need to make a few changes. First, we'll add not-null constraints to `name` and `email`. There's no need for either field to ever be null. The same goes for many fields. If nullable columns are common among your tables, I would think about your design. Second, since emails are case insensitive, our index will need to reflect that. In PostgreSQL, the default [collation](https://www.postgresql.org/docs/current/collation.html) will be case-sensitive. This means that `daniel@example.com` and `DANIEL@example.com` are considered two different emails. To fix this problem, we'll use an [expression index](https://www.postgresql.org/docs/current/indexes-expressional.html) to lower case email data in the index.
 
-Let's make our changes.
+Make those changes.
 
 `db/migrate/[timestamp]_create_users.rb`
 
@@ -55,7 +55,7 @@ class CreateUsers < ActiveRecord::Migration[7.0]
 end
 ```
 
-Let's run our migration.
+Run the migration.
 
 `Terminal`
 
@@ -71,7 +71,7 @@ $ bin/rails db:migrate
 
 You'll notice that it automatically updates `db/schema.rb`. Now that we've handled our database, we want to enforce the same constraints in our application code. We want to enforce it in the `User` model, to be exact. The way we do this is with model validations. We want to validate that both `name` and `email` are present. We also want to validate that `email` is unique among all users.
 
-Let's add our validations.
+Add the validations.
 
 `app/models/user.rb`
 
@@ -84,7 +84,7 @@ end
 
 Rails also generated some fixtures for you. Fixtures offer a way to seed your database with sample data. Fixtures are loaded automatically in the test environment and can be loaded in development as well, using `bin/rails db:fixtures:load`. An alternative to fixtures, that you might see, are factories.
 
-Let's add some custom fixtures.
+Add some custom fixtures.
 
 `test/fixtures/users.yml`
 
@@ -108,7 +108,7 @@ daniel:
 
 Before we write tests, one addition to our Gemfile will be invaluable. That addition will be the [shoulda](https://github.com/thoughtbot/shoulda) gem. We can follow the [installation steps](https://github.com/thoughtbot/shoulda-matchers#minitest) to get set up.
 
-Let's add `shoulda` to the `Gemfile`.
+Add `shoulda` to the `Gemfile`.
 
 `Gemfile` (lines omitted)
 
@@ -118,7 +118,7 @@ group :test do
 end
 ```
 
-Let's make sure to install it.
+Make sure to install the new gem.
 
 `Terminal` (output omitted)
 
@@ -126,7 +126,7 @@ Let's make sure to install it.
 $ bundle install
 ```
 
-Let's add some configuration for our app.
+Add the configuration.
 
 `test/test_helper.rb` (lines omitted)
 
@@ -141,7 +141,7 @@ end
 
 We're ready to test! We want to write tests for the constraints and validations that we've added. Fortunately [shoulda-context](https://github.com/thoughtbot/shoulda-context) and [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) make testing validations really easy.
 
-Let's write a test for every validation in our model.
+Write a test for every validation in the model.
 
 `test/models/user_test.rb`
 
@@ -157,7 +157,7 @@ class UserTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run our tests!
+Run the tests.
 
 `Terminal`
 

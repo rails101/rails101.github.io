@@ -9,7 +9,7 @@ categories: guide
 
 To finish up our user story, we need to expose rounds through our API. We'll do that with a new root-level field named `rounds` and new types, `RoundType` and `SelectionType`. Most fields won't be noteworthy, except for two. We'll add a `selections` field to `RoundType` and a `user` field to `SelectionType`.
 
-Let's generate our `RoundType`.
+Generate a `RoundType`.
 
 `Terminal`
 
@@ -18,7 +18,7 @@ $ bin/rails g graphql:object Round selections:\[Selection\]
       create  app/graphql/types/round_type.rb
 ```
 
-Let's just make sure `selections` can't be `null`.
+Make sure `selections` can't be `null`.
 
 `app/graphql/types/round_type.rb`
 
@@ -33,7 +33,7 @@ module Types
 end
 ```
 
-Let's generate our `SelectionType`.
+Generate a `SelectionType`.
 
 `Terminal`
 
@@ -44,7 +44,7 @@ $ bin/rails g graphql:object Selection user:User
 
 We'll make two changes to `SelectionType`. First we'll remove `round_id` and `user_id` since we'll want to leverage the graph instead of these particular ID fields. Second, we'll make sure `user` can't be `null`.
 
-Let's make those changes.
+Make those changes.
 
 `app/graphql/types/selection_type.rb`
 
@@ -61,7 +61,7 @@ end
 
 You might notice that `RoundType` has a `selections` field but the `Round` model doesn't have any method with that name. Before we fix that, let's talk about order. You might think that either the database or Rails will use a default sort order. You might even fetch some rows in the console and see results ordered by ID. That would be a coincidence. PostgreSQL does not actually guarantee row order, unless specified. Since we want results to be exact and consistent, we should alway specify. We could do this by adding a custom `selections` method on `RoundType`, but I would rather avoid custom methods on model types. The approach we'll take is to set the order when declaring the relation.
 
-Let's add the relation.
+Add the relation.
 
 `app/models/round.rb`
 
@@ -71,7 +71,7 @@ class Round < ApplicationRecord
 end
 ```
 
-Let's add a test.
+Add a test.
 
 `test/models/round_test.rb`
 
@@ -85,7 +85,7 @@ class RoundTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run our new test.
+Run the new test.
 
 `Terminal`
 
@@ -104,7 +104,7 @@ Finished in 0.051161s, 19.5461 runs/s, 19.5461 assertions/s.
 
 Now we're ready to add our `rounds` field. You might be tempted to just write `Round.all`. I see it often, but we want results to be exact and consistent so we will use `Round.all.order(:id)`.
 
-Let's add our new field.
+Add the new field.
 
 `app/graphql/types/query_type.rb`
 
@@ -145,7 +145,7 @@ end
 
 You might be wondering how we can write exact and consistent tests when our fixtures do not specify IDs. We could specify IDs for all of our fixtures, but [Rails will actually generate consistent IDs based on the fixture's label](https://api.rubyonrails.org/v7.0.3/classes/ActiveRecord/FixtureSet.html). Armed with this knowledge, we can spy on the ordering using something like `Selection.all.order(:id).map { |s| s.user.name }`.
 
-Let's generate a test for our new field.
+Generate a test for the new field.
 
 `Terminal`
 
@@ -155,7 +155,7 @@ $ bin/rails g integration_test types/query_type/rounds
       create    test/integration/types/query_type/rounds_test.rb
 ```
 
-Let's fill in the generated test.
+Fill in the generated test.
 
 `test/integration/types/query_type/rounds_test.rb`
 
@@ -230,7 +230,7 @@ class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run our new tests.
+Run the new test.
 
 `Terminal`
 
@@ -247,7 +247,7 @@ Finished in 0.157249s, 6.3593 runs/s, 6.3593 assertions/s.
 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

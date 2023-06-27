@@ -13,7 +13,7 @@ categories: guide
 
 So far we're only fetching data through graphql queries, but this user story will require a mutation. Mutations are used to create, update, and destroy records and in this chapter we'll create our first mutation class.
 
-Let's remind ourselves of the available generators by using the `--help` flag.
+Check out the available generators by using the `--help` flag.
 
 `Terminal` (output omitted)
 
@@ -21,7 +21,7 @@ Let's remind ourselves of the available generators by using the `--help` flag.
 $ bin/rails g --help
 ```
 
-Let's use the `graphql:mutation_create` generator.
+Use the `graphql:mutation_create` generator.
 
 `Terminal`
 
@@ -32,7 +32,7 @@ $ bin/rails g graphql:mutation_create User
 
 You'll see that the generator modified `app/graphql/types/mutation_type.rb` and created `app/graphql/mutations/user_create.rb`. Looking at our new mutation class, we can see that most of the work happens in the `resolve` method. If the new user fails to save, we raise a `GraphQL::ExecutionError` error. If the new user saves just fine, we return a response with the `user` field set. The mutation is nearly complete and we got it for free, but let's add our own flavor to it. We can make error handling more generic, like we did in Chapter 4, and replace the existing lines with a single `create!` call. We also see a new input type, `Types::UserInputType`, that we'll need to generate.
 
-Let's clean up `app/graphql/types/mutation_type.rb` a little.
+Clean up `Types::MutationType` a little.
 
 `app/graphql/types/mutation_type.rb`
 
@@ -44,7 +44,7 @@ module Types
 end
 ```
 
-Let's make our changes to `app/graphql/mutations/user_create.rb` as well.
+Make some changes to `Mutations::UserCreate` as well.
 
 `app/graphql/mutations/user_create.rb`
 
@@ -65,7 +65,7 @@ module Mutations
 end
 ```
 
-Let's add some global error handling.
+Add some global error handling.
 
 `app/graphql/all_hands_schema.rb` (lines omitted)
 
@@ -84,7 +84,7 @@ class AllHandsSchema < GraphQL::Schema
 end
 ```
 
-Let's generate the input type.
+Generate the input type.
 
 `Terminal`
 
@@ -95,7 +95,7 @@ $ bin/rails g graphql:input User
 
 We can see that our new class picked up all `User` attributes, but we only intend to accept `name` and `email`. We also intend to require `name` and `email`.
 
-Let's make those changes.
+Make those changes.
 
 `app/graphql/types/user_input_type.rb`
 
@@ -108,7 +108,7 @@ module Types
 end
 ```
 
-Let's generate a test for our mutation.
+Generate a test for the mutation.
 
 `Terminal`
 
@@ -118,7 +118,7 @@ $ bin/rails g integration_test types/mutation_type/user_create
       create    test/integration/types/mutation_type/user_create_test.rb
 ```
 
-Let's fill in the generated test.
+Fill in the generated test.
 
 `test/integration/types/mutation_type/user_create_test.rb`
 
@@ -208,7 +208,7 @@ end
 
 These tests should look similar to the last set we wrote, with a few exceptions. Here we're performing a mutation instead of a query and the error case is different, but quite familiar.
 
-Let's run our new tests.
+Run the new tests.
 
 `Terminal`
 
@@ -225,7 +225,7 @@ Finished in 0.126581s, 15.8002 runs/s, 31.6003 assertions/s.
 2 runs, 4 assertions, 0 failures, 0 errors, 0 skip
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

@@ -13,7 +13,7 @@ categories: guide
 
 We're finally ready to give clients the ability to modify a user's archived status. We already know exactly what we'll need.
 
-Let's go ahead and generate a new mutation.
+Generate a new mutation.
 
 `Terminal`
 
@@ -22,7 +22,7 @@ $ bin/rails g graphql:mutation UserArchive
       create  app/graphql/mutations/user_archive.rb
 ```
 
-Let's alphabetize our mutations.
+Sort the mutations.
 
 `app/graphql/types/mutation_type.rb`
 
@@ -40,7 +40,7 @@ end
 
 Since we used a more generic generator, we'll have to fill in a lot more by hand this time. Luckily we have plenty of examples to draw from.
 
-Let's fill in our new mutation.
+Fill in the new mutation.
 
 `app/graphql/mutations/user_archive.rb`
 
@@ -62,7 +62,7 @@ module Mutations
 end
 ```
 
-Let's generate tests for our mutation.
+Generate a test for the mutation.
 
 `Terminal`
 
@@ -72,7 +72,7 @@ $ bin/rails g integration_test types/mutation_type/user_archive
       create    test/integration/types/mutation_type/user_archive_test.rb
 ```
 
-Let's fill in the generated tests.
+Fill in the generated test.
 
 `test/integration/types/mutation_type/user_archive_test.rb`
 
@@ -157,7 +157,7 @@ class Types::MutationType::UserArchiveTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run our tests.
+Run the test.
 
 `Terminal`
 
@@ -174,7 +174,7 @@ Finished in 0.134561s, 14.8631 runs/s, 59.4526 assertions/s.
 2 runs, 8 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

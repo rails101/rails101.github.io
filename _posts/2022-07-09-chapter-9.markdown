@@ -13,7 +13,7 @@ categories: guide
 
 We know that we create records through mutations and we've covered the topic before so this should be quick.
 
-Let's generate our mutation.
+Generate a mutation.
 
 `Terminal`
 
@@ -24,7 +24,7 @@ $ bin/rails g graphql:mutation_create Round
 
 A mutation class named `Mutations::RoundCreate` is generated for us and a `round_create` field is added to `Types::MutationType`. We won't need to make any changes to `app/graphql/types/mutation_type.rb` so let's look at `app/graphql/mutations/round_create.rb`. We won't need `round_input` so we'll remove that. We've already got some generic error handling set up so we'll use `create!` again, instead of `save`. We're not anticipating any failures here anyway, but if it happens we'll catch it.
 
-Let's make those changes.
+Make those changes.
 
 `app/graphql/mutations/round_create.rb`
 
@@ -43,7 +43,7 @@ module Mutations
 end
 ```
 
-Let's generate our tests.
+Generate a new test.
 
 `Terminal`
 
@@ -53,7 +53,7 @@ $ bin/rails g integration_test types/mutation_type/round_create
       create    test/integration/types/mutation_type/round_create_test.rb
 ```
 
-Let's fill in the generated tests.
+Fill in the generated test.
 
 `test/integration/types/mutation_type/round_create_test.rb`
 
@@ -104,7 +104,7 @@ class Types::MutationType::RoundCreateTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run our new test.
+Run the new test.
 
 `Terminal`
 
@@ -121,7 +121,7 @@ Finished in 0.149116s, 6.7062 runs/s, 13.4124 assertions/s.
 1 runs, 2 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

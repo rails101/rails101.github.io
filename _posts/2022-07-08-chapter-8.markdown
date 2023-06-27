@@ -9,7 +9,7 @@ categories: guide
 
 What we have works, but something stands out. Whenever we're requesting records through one or more levels of `has_many`, we should be on the lookout for N+1 queries. These issues are hard to write automated tests for, but very easy to spot with the naked eye. Since we are potentially requesting multiple levels of records in `rounds`, let's see if we have some bad queries lurking.
 
-Let's start tailing our test logs.
+Start tailing our test logs.
 
 `Terminal` (output omitted)
 
@@ -19,7 +19,7 @@ $ tail -f log/test.log
 
 You'll need to leave this running.
 
-Let's run the tests again.
+Run the tests again.
 
 `Terminal`
 
@@ -57,7 +57,7 @@ Completed 200 OK in 39ms (Views: 0.5ms | ActiveRecord: 1.5ms | Allocations: 1757
 
 See how the same queries are being run back-to-back? That's what we're looking for. That doesn't look too bad, so let's make it worse.
 
-Let's add some additional users.
+Add some additional users.
 
 `test/integration/types/query_type/rounds_test.rb` (lines omitted)
 
@@ -76,7 +76,7 @@ class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run the tests again.
+Run the tests again.
 
 `Terminal` (output omitted)
 
@@ -86,7 +86,7 @@ $ bin/rails t test/integration/types/query_type/rounds_test.rb
 
 Don't mind the failure, but take a look back at the logs and things are much worse! We can see the cache helping out a bit, but we can do better. Our main weapon against N+1 queries is [includes](https://guides.rubyonrails.org/active_record_querying.html#includes).
 
-Let's include `selections` and `users` in our root-level field.
+Include `selections` and `users` in the root-level field.
 
 `app/graphql/types/query_type.rb` (lines omitted)
 
@@ -104,7 +104,7 @@ module Types
 end
 ```
 
-Let's run the tests again.
+Run the tests again.
 
 `Terminal` (output omitted)
 
@@ -114,9 +114,9 @@ $ bin/rails t test/integration/types/query_type/rounds_test.rb
 
 Check the logs and things should look much better. You can see that, `includes` has drastically cut down the number of requests to the database. We now make a single `SELECT` each, for `rounds`, `selections`, and `users`.
 
-Let's go ahead and undo the changes to `test/integration/types/query_type/rounds_test.rb`.
+Undo the changes to `test/integration/types/query_type/rounds_test.rb`.
 
-Let's run the tests again.
+Run the tests again.
 
 `Terminal`
 
@@ -137,7 +137,7 @@ Tests are passing again and our logs should look the same as before, just with l
 
 We've drastically cut down the number of SQL requests, but there's one last issue. With graphql, it's left up to the client to decide what data they want. With our current logic, we may be making **too many** requests to the database. For example, if the client does not include the `user` field, our `SELECT "users".* FROM "users" ...` would be for nothing. I'm getting dizzy. If only there was a way for us to know which records we should include. Lucky for us, we have the [Lookahead](https://graphql-ruby.org/queries/lookahead.html). We'll need to refactor our `rounds` field one last time.
 
-Let's add new tests for the new scenarios.
+Add new tests for the new scenarios.
 
 `test/integration/types/query_type/rounds_test.rb`
 
@@ -285,7 +285,7 @@ class Types::QueryType::RoundsTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run the tests again.
+Run the tests again.
 
 `Terminal`
 
@@ -304,7 +304,7 @@ Finished in 0.181486s, 16.5302 runs/s, 16.5302 assertions/s.
 
 We haven't changed any functionality so tests are still green. However, if you check the logs, you'll see that we're fetching selections and users from the database, regardless of whether we actually need them. Finally, here is the big payoff.
 
-Let's use our Lookahead.
+Use the Lookahead.
 
 `app/graphql/types/query_type.rb`
 
@@ -355,7 +355,7 @@ end
 
 There's a bit going on here. First, `extras: [:lookahead]` makes `lookahead` available within our method. We can use that to check which selections the client has made. Be careful not to confuse `lookahead.selection` with the `selections` field on `RoundType`. Unfortunate naming for this guide. Understanding the rest just requires an understanding of the arguments that `includes` accepts. We have three options for the records we want to preload: nothing, just `selections`, both `selections` and `users`. The matching includes arguments are `{}`, `{selections:{}}`, and `{selections:{user:{}}}`, respectively. Another way this could have worked is with `nil`, `:selections`, and `selections: :user`. The last one should look familiar.
 
-Let's run the tests once more.
+Run the tests once more.
 
 `Terminal`
 
@@ -374,7 +374,7 @@ Finished in 0.181383s, 16.5396 runs/s, 16.5396 assertions/s.
 
 Checking the logs should reveal that we're only selecting data when it's actually needed. For example, we only see `SELECT "users".* FROM "users" ...` when the `user` field is included in the GraphQL request.
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

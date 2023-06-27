@@ -13,7 +13,7 @@ categories: guide
 
 We'll need another root-level field named `user`. Since we've already got GraphQL completely set up, adding this field should be trivial. There will be one new concept. We'll need to accept an ID parameter. In GraphQL, that is accomplished with the `argument` helper.
 
-Let's add the `user` field to `QueryType`.
+Add the `user` field to `QueryType`.
 
 `app/graphql/types/query_type.rb`
 
@@ -47,7 +47,7 @@ end
 
 Since `find` will raise an error if it fails to find a record, we need to handle that as well. Luckily, [GraphQL documentation](https://graphql-ruby.org/errors/error_handling.html) gives us some clear guidance on how to do that.
 
-Let's add some global error handling.
+Add some global error handling.
 
 `app/graphql/all_hands_schema.rb` (lines omitted)
 
@@ -63,7 +63,7 @@ class AllHandsSchema < GraphQL::Schema
 end
 ```
 
-Let's generate a test for our new field.
+Generate a test for our new field.
 
 `Terminal`
 
@@ -73,7 +73,7 @@ $ bin/rails g integration_test types/query_type/user
       create    test/integration/types/query_type/user_test.rb
 ```
 
-Let's fill in the generated test.
+Fill in the generated test.
 
 `test/integration/types/query_type/user_test.rb`
 
@@ -138,7 +138,7 @@ end
 
 This is only slightly more complicated than the previous test class. Here, we pass our arguments using the `variables` parameter. We also name our query and declare its variables. The same tests could be written using Ruby string interpolation, but this way is cleaner.
 
-Let's run our new tests.
+Run the new tests.
 
 `Terminal`
 
@@ -155,7 +155,7 @@ Finished in 0.151358s, 13.2137 runs/s, 13.2137 assertions/s.
 2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

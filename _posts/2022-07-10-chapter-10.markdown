@@ -13,7 +13,7 @@ categories: guide
 
 This is why we're here - we're ready to select a user! Let's remind ourselves how the selection process should work. We will pick randomly from the pool of available engineers and mark the selection by creating a new selection record. Users are available for selection if they were created before this round was created and have not yet been selected for it.
 
-Let's generate our mutation.
+Generate a mutation.
 
 `Terminal`
 
@@ -22,7 +22,7 @@ $ bin/rails g graphql:mutation_create Selection
       create  app/graphql/mutations/selection_create.rb
 ```
 
-Let's alphabetize our mutations.
+Sort the mutations.
 
 `app/graphql/types/mutation_type.rb`
 
@@ -36,7 +36,7 @@ module Types
 end
 ```
 
-Let's clean up our new mutation class, keeping the input type this time.
+Clean up the new mutation class, keeping the input type this time.
 
 `app/graphql/mutations/selection_create.rb`
 
@@ -57,7 +57,7 @@ module Mutations
 end
 ```
 
-Let's generate our input type.
+Generate the input type.
 
 `Terminal`
 
@@ -66,7 +66,7 @@ $ bin/rails g graphql:input Selection
       create  app/graphql/types/selection_input_type.rb
 ```
 
-Let's remove every argument except `round_id` and make `round_id` required.
+Remove every argument except `round_id` and make `round_id` required.
 
 `app/graphql/types/selection_input_type.rb`
 
@@ -80,7 +80,7 @@ end
 
 We're not accepting a `user_id` because we're going to handle that server-side. Often we will go right to the mutation, controller, or service and add the necessary logic. However, this might be a good use case for [Active Record Callbacks](https://guides.rubyonrails.org/active_record_callbacks.html). When we create a selection, a user should be automatically selected. This sounds related to initialization, so let's use `after_initialize`. We have other options like `before_create`, but this choice works well. One last thing is that callbacks can seem very magical. It can feel weird to have properties change on their own. To many, making an explicit call to a method would feel better. I used to view Active Record objects as simple objects that acted as a bridge between my input and the database. Now I view them as objects that have full control over their own properties and life cycle. If I were using some external library or even using an external api, of course it would make complete sense that creating a `Selection` actually **makes** a selection, so why should it feel weird here?
 
-Let's add in our new selection logic.
+Add in the new selection logic.
 
 `app/models/selection.rb`
 
@@ -101,7 +101,7 @@ end
 
 Our additions to the `Selection` model should be pretty easy to follow. After initialization, we check to see if we need to select a user. If yes, we ask `round` for `available_users` and pick one at random using `sample`. Of course, to make this work we'll need `Round#available_users`.
 
-Let's add `available_users`.
+Add `available_users`.
 
 `app/models/round.rb`
 
@@ -118,7 +118,7 @@ end
 
 The body of the method retrieves all users except the ones that are already associated with this round. `users` is a new relation also added here. Now that we've defined how things should work, let's go through in reverse order and test them out. If something is broken, we can fix it before moving up to the next level.
 
-Let's add our test for `Round`.
+Add tests for `Round`.
 
 `test/models/round_test.rb`
 
@@ -145,7 +145,7 @@ class RoundTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run these tests.
+Run the tests.
 
 `Terminal`
 
@@ -162,7 +162,7 @@ Finished in 0.117191s, 34.1323 runs/s, 34.1323 assertions/s.
 4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's add our test for `Selection`.
+Add tests for `Selection`.
 
 `test/models/selection_test.rb`
 
@@ -207,7 +207,7 @@ class SelectionTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run these tests.
+Run the tests.
 
 `Terminal`
 
@@ -226,7 +226,7 @@ Finished in 0.158292s, 44.2221 runs/s, 50.5395 assertions/s.
 
 Testing for true randomness can be difficult so we just wrote some pretty simple tests.
 
-Let's finally generate tests for our mutation.
+Generate a test for the mutation.
 
 `Terminal`
 
@@ -236,7 +236,7 @@ $ bin/rails g integration_test types/mutation_type/selection_create
       create    test/integration/types/mutation_type/selection_create_test.rb
 ```
 
-Let's fill in the generated tests.
+Fill in the generated test.
 
 `test/integration/types/mutation_type/selection_create_test.rb`
 
@@ -330,7 +330,7 @@ class Types::MutationType::SelectionCreateTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's run our new tests.
+Run the new tests.
 
 `Terminal`
 
@@ -347,7 +347,7 @@ Finished in 0.150902s, 13.2536 runs/s, 26.5073 assertions/s.
 2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

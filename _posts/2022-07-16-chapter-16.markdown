@@ -13,7 +13,7 @@ categories: guide
 
 Sometimes you want to update records instead of fetching them. Of course, this too might become an issue at scale. Our current request is a simple but costly update.
 
-Let's open up a console.
+Open up a console.
 
 `Terminal`
 
@@ -23,7 +23,7 @@ Loading development environment (Rails 7.0.3.1)
 irb(main):001:0>
 ```
 
-Let's reset the archived status of all users and benchmark the update.
+Reset the archived status of all users and benchmark the update.
 
 **Rails Console**
 
@@ -35,7 +35,7 @@ Let's reset the archived status of all users and benchmark the update.
 
 On my machine, this run took about 20 seconds. Not so bad, right? Common Rails wisdom says to perform large updates like this in [batches](https://edgeapi.rubyonrails.org/classes/ActiveRecord/Batches.html) because of locks and such, but we don't have to take anybody's word for it. Let's see for ourselves by running some updates and [monitoring locks](https://wiki.postgresql.org/wiki/Lock_Monitoring). Please note that for this exercise you'll be opening three different database consoles.
 
-Let's start the first console.
+Start the first database console.
 
 `Terminal`
 
@@ -47,7 +47,7 @@ Type "help" for help.
 all_hands_development=#
 ```
 
-Let's start by inspecting the existing locks.
+Inspect the existing locks.
 
 **PostgreSQL Console (1)**
 
@@ -62,7 +62,7 @@ Let's start by inspecting the existing locks.
 
 You can see a couple of existing locks, but everything looks normal. For the rest of the chapter we'll focus only on locks that have not been granted, but you're encouraged to keep inspecting all locks at every step of the way to see what's happening.
 
-Let's look for locks that have yet to be granted.
+Look for locks that have yet to be granted.
 
 **PostgreSQL Console (1)**
 
@@ -75,7 +75,7 @@ Let's look for locks that have yet to be granted.
 
 Nothing here as expected.
 
-Let's start a second console.
+Start a second console.
 
 `Terminal`
 
@@ -87,7 +87,7 @@ Type "help" for help.
 all_hands_development=#
 ```
 
-Let's begin a large update, promoting everyone to captain.
+Begin a large update, promoting everyone to captain.
 
 **PostgreSQL Console (2)**
 
@@ -99,7 +99,7 @@ UPDATE 1000000
 
 What we've done is began a transaction and performed an update of every row in the table. To perform the update, the transaction has acquired some number of locks. These locks will not be released until the transaction ends.
 
-Let's go back to the first console and look for any locks that have yet to be granted.
+Go back to the first console and look for any locks that have yet to be granted.
 
 **PostgreSQL Console (1)**
 
@@ -112,7 +112,7 @@ Let's go back to the first console and look for any locks that have yet to be gr
 
 Empty again. So far so good.
 
-Let's start a third console.
+Start a third console.
 
 `Terminal`
 
@@ -124,7 +124,7 @@ Type "help" for help.
 all_hands_development=#
 ```
 
-Let's confirm that the locks do not affect data reads.
+Confirm that the locks do not affect data reads.
 
 **PostgreSQL Console (3)**
 
@@ -138,7 +138,7 @@ Let's confirm that the locks do not affect data reads.
 
 Reading data works fine, but notice we do get the "old" name. The update transaction has not committed any data.
 
-Let's try a quick update of a single row.
+Try a quick update of a single row.
 
 **PostgreSQL Console (3)**
 
@@ -148,7 +148,7 @@ Let's try a quick update of a single row.
 
 What's happening here? No matter how long we wait this command does not return.
 
-Let's go back to the first console and look for any locks that have yet to be granted.
+Go back to the first console and look for any locks that have yet to be granted.
 
 **PostgreSQL Console (1)**
 
@@ -162,7 +162,7 @@ Let's go back to the first console and look for any locks that have yet to be gr
 
 Aha! We do have a lock that's waiting to be granted.
 
-Let's go back to the second console and finally commit the transaction.
+Go back to the second console and finally commit the transaction.
 
 **PostgreSQL Console (2)**
 
@@ -170,7 +170,7 @@ Let's go back to the second console and finally commit the transaction.
 =# commit;
 ```
 
-Let's go back to the first console and look for any locks that have yet to be granted.
+Go back to the first console and look for any locks that have yet to be granted.
 
 **PostgreSQL Console (1)**
 
@@ -191,7 +191,7 @@ Checking the third console, you'll see that your last command was able to return
 UPDATE 1
 ```
 
-Let's see the user's final name.
+Check the user's final name.
 
 **PostgreSQL Console (3)**
 
@@ -205,7 +205,7 @@ Let's see the user's final name.
 
 What I personally take from this exercise is that the problem isn't really with locking a large number of rows or even the entire table. The problem is the amount of time that we're holding locks and blocking other operations. Think of a drive-through or any other queue. If a car comes through the drive-through and makes a single order with 100 items, then the cars behind them will be blocked until that order is complete. Since the system is designed to process a large amount of orders, the same car could split their order into batches of smaller orders. Spacing those orders out throughout the day would cause little-to-no disruption to the system. The same principle applies here. What we should do is split our request into a set of smaller requests that the system can easily handle. Our goal is to obtain the lock, do the work, and release the lock in a reasonable amount of time.
 
-Let's toggle archived status again, but using `in_batches`.
+Toggle archived status again, but use `in_batches`.
 
 **Rails Console** (output omitted)
 

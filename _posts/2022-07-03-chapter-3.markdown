@@ -17,7 +17,7 @@ Let's start with our first user story.
 
 First, we have to decide which type of API to build. [GraphQL](https://graphql.org/) has been steadily growing in popularity thanks to its long list of benefits. Our specific flavor will be [GraphQL Ruby](https://graphql-ruby.org/).
 
-Let's get started by adding the gem to our project.
+Add graphql to the Gemfile.
 
 `Gemfile` (lines omitted)
 
@@ -26,7 +26,7 @@ Let's get started by adding the gem to our project.
 gem "graphql", "~> 2.0"
 ```
 
-Let's make sure to install it.
+Make sure to install it.
 
 `Terminal` (output omitted)
 
@@ -38,7 +38,7 @@ $ bundle
 
 You'll see that a lot of boilerplate code has been generated.
 
-Let's make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 
@@ -48,13 +48,13 @@ $ bin/rails t
 
 Success!
 
-Let's commit the changes before moving on.
+Commit the changes before moving on.
 
 ```
 ✅ Make a commit
 ```
 
-Let's generate a new type to match our existing model.
+Generate a new type to match the existing model.
 
 `Terminal`
 
@@ -97,7 +97,7 @@ $ bin/rails g integration_test types/query_type/users
       create    test/integration/types/query_type/users_test.rb
 ```
 
-Let's fill in the generated test.
+Fill in the generated test.
 
 `test/integration/types/query_type/users_test.rb`
 
@@ -149,7 +149,7 @@ end
 
 This test should seem very straightforward. We make a real request to our graphql endpoint with the query param set to our graphql query. No magic, no mocks, just a real request and a real response. In the response, we expect there to be users ordered by their emails. `@response.parsed_body` is a call to a helper method that parses the response body as JSON, returning a hash. Similarly, `@response.body` would give us a string. Our only assertion is that the parsed body equals the expected hash exactly. This might feel brittle at first - it should. There's no room for error here. Our responses should be exact and consistent, every time. If this test is flaky or becomes flaky over time, you mostly likely have an issue.
 
-Let's run our new tests.
+Run the new tests.
 
 `Terminal`
 
@@ -166,7 +166,7 @@ Finished in 0.140711s, 7.1068 runs/s, 7.1068 assertions/s.
 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 

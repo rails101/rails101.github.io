@@ -13,7 +13,7 @@ categories: guide
 
 Now that we have the `archived` column working we need to put it to use.
 
-Let's add some archived users to our fixtures to help with testing.
+Add some archived users to the fixtures to help with testing.
 
 `test/fixtures/users.yml`
 
@@ -57,7 +57,7 @@ stinkie:
 
 We know that we're dealing with selections, so a good place to start is our `Selection` model. After quickly reminding ourselves of the logic in `after_initialize`, our eyes zero in on `round.available_users.sample`. We'll need to refactor `Round#available_users` so that it does not return archived users. Continuing this process, we'll push down into our models until we've made adequate changes. Then we'll pop back up, testing each layer. We won't need any changes to `Selection`, but we should still add to the test.
 
-Let's refactor `Round#available_users` to not return archived users.
+Refactor `Round#available_users` to not return archived users.
 
 `app/models/round.rb`
 
@@ -72,7 +72,7 @@ class Round < ApplicationRecord
 end
 ```
 
-Let's add the missing `User.unarchived` method in the form of a scope.
+Add the missing `User.unarchived` method in the form of a scope.
 
 `app/models/user.rb`
 
@@ -86,7 +86,7 @@ class User < ApplicationRecord
 end
 ```
 
-Let's add tests for `User.unarchived`.
+Add tests for `User.unarchived`.
 
 `test/models/user_test.rb`
 
@@ -114,7 +114,7 @@ class UserTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run our tests.
+Run the tests.
 
 `Terminal`
 
@@ -131,7 +131,7 @@ Finished in 0.101266s, 49.3749 runs/s, 49.3749 assertions/s.
 5 runs, 5 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's add tests for `Round#available_users`.
+Add tests for `Round#available_users`.
 
 `test/models/round_test.rb`
 
@@ -165,7 +165,7 @@ class RoundTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run our tests.
+Run the tests.
 
 `Terminal`
 
@@ -181,7 +181,7 @@ Finished in 0.072143s, 55.4454 runs/s, 55.4454 assertions/s.
 4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's finish up with our selection tests.
+Finish up with the selection tests.
 
 `test/models/selection_test.rb`
 
@@ -241,7 +241,7 @@ class SelectionTest < ActiveSupport::TestCase
 end
 ```
 
-Let's run our tests.
+Run the tests.
 
 `Terminal`
 
@@ -258,7 +258,7 @@ Finished in 0.099506s, 70.3475 runs/s, 100.4965 assertions/s.
 7 runs, 10 assertions, 0 failures, 0 errors, 0 skips
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests.
+Check for regressions by running all tests.
 
 `Terminal` (output omitted)
 
@@ -268,7 +268,7 @@ $ bin/rails t
 
 Uh oh! Our `users` query is returning more data than our test is expecting because of the new fixtures. Easy fix.
 
-Let's update our test.
+Update the test.
 
 `test/integration/types/query_type/users_test.rb`
 
@@ -324,7 +324,7 @@ class Types::QueryType::UsersTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Let's also make sure we don't have any regressions by running all of our tests (again).
+Check for regressions by running all tests (again).
 
 `Terminal` (output omitted)
 
