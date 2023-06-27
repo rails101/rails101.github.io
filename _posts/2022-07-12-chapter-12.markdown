@@ -16,7 +16,7 @@ Generate a migration for the new column.
 `Terminal`
 
 ```bash
-$ bin/rails g migration AddArchivedToUser archived:boolean
+bin/rails g migration AddArchivedToUser archived:boolean
 ```
 
 We'll make a couple additions to the migration. First, we'll add a not-null constraint. That will help us [Avoid the Three-state Boolean Problem](https://thoughtbot.com/blog/avoid-the-threestate-boolean-problem). Second, we'll add a default value. PostgreSQL will use the default for any existing columns. Keep in mind that this can be dangerous with a large number of existing rows. We don't have to worry about that yet. The default will also be used for any new instances of `User` where `archived` is not specified.
@@ -38,7 +38,7 @@ Run the migration.
 `Terminal`
 
 ```bash
-$ bin/rails db:migrate
+bin/rails db:migrate
 ```
 
 Add a validation for the new column.
@@ -75,7 +75,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/user_test.rb
+bin/rails t test/models/user_test.rb
 ```
 
 Expose the new field to the API.
@@ -165,7 +165,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/user_test.rb
+bin/rails t test/integration/types/query_type/user_test.rb
 ```
 
 Add the new field to one more test.
@@ -225,7 +225,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/users_test.rb
+bin/rails t test/integration/types/query_type/users_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -233,7 +233,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

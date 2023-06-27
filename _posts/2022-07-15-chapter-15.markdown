@@ -34,7 +34,7 @@ Start the rails console.
 `Terminal`
 
 ```bash
-$ bin/rails c
+bin/rails c
 ```
 
 Add a million users with random data.
@@ -94,7 +94,7 @@ Generate a migration.
 `Terminal`
 
 ```bash
-$ bin/rails g migration AddIndexToUsersOnArchivedName
+bin/rails g migration AddIndexToUsersOnArchivedName
 ```
 
 Fill in the new migration.
@@ -114,7 +114,7 @@ Run the migration.
 `Terminal`
 
 ```bash
-$ bin/rails db:migrate
+bin/rails db:migrate
 ```
 
 See how the new index affects the query plan.
@@ -151,7 +151,7 @@ Roll back the migration.
 `Terminal`
 
 ```bash
-$ bin/rails db:rollback
+bin/rails db:rollback
 ```
 
 Update the new migration with a partial index.
@@ -172,7 +172,7 @@ Run the migration.
 `Terminal`
 
 ```bash
-$ bin/rails db:migrate
+bin/rails db:migrate
 ```
 
 See how this index affects the query plan.
@@ -260,7 +260,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/users_test.rb
+bin/rails t test/integration/types/query_type/users_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -268,7 +268,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

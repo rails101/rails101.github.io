@@ -16,7 +16,7 @@ Generate a mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:mutation_create Round
+bin/rails g graphql:mutation_create Round
 ```
 
 A mutation class named `Mutations::RoundCreate` is generated for us and a `round_create` field is added to `Types::MutationType`. We won't need to make any changes to `app/graphql/types/mutation_type.rb` so let's look at `app/graphql/mutations/round_create.rb`. We won't need `round_input` so we'll remove that. We've already got some generic error handling set up so we'll use `create!` again, instead of `save`. We're not anticipating any failures here anyway, but if it happens we'll catch it.
@@ -45,7 +45,7 @@ Generate a new test.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/mutation_type/round_create
+bin/rails g integration_test types/mutation_type/round_create
 ```
 
 Fill in the generated test.
@@ -104,7 +104,7 @@ Run the new test.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/mutation_type/round_create_test.rb
+bin/rails t test/integration/types/mutation_type/round_create_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -112,7 +112,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

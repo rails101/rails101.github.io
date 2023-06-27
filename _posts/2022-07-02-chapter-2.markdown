@@ -14,7 +14,7 @@ Check out documentation for the `generate model` command.
 `Terminal`
 
 ```bash
-$ bin/rails generate model
+bin/rails generate model
 ```
 
 Skim through the output to see the available options.
@@ -24,7 +24,7 @@ Generate a `User` model.
 `Terminal`
 
 ```bash
-$ bin/rails generate model user name:string email:string:uniq
+bin/rails generate model user name:string email:string:uniq
 ```
 
 Take a look at what was generated for you. We're off to a great start just by leveraging the magic of Rails, but we want to make some changes of our own. First we'll check the migration. We're creating the `users` table with `name` and `email` fields. We're also adding a unique index on `email`. There are two benefits to this index. First, it ensures that two users can't be created with the same email. Second, it can speed up queries that search and filter by email.
@@ -54,7 +54,7 @@ Run the migration.
 `Terminal`
 
 ```bash
-$ bin/rails db:migrate
+bin/rails db:migrate
 ```
 
 You'll notice that it automatically updates `db/schema.rb`. Now that we've handled our database, we want to enforce the same constraints in our application code. We want to enforce it in the `User` model, to be exact. The way we do this is with model validations. We want to validate that both `name` and `email` are present. We also want to validate that `email` is unique among all users.
@@ -111,7 +111,7 @@ Make sure to install the new gem.
 `Terminal`
 
 ```bash
-$ bundle install
+bundle install
 ```
 
 Add the configuration.
@@ -150,7 +150,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

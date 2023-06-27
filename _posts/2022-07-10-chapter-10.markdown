@@ -16,7 +16,7 @@ Generate a mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:mutation_create Selection
+bin/rails g graphql:mutation_create Selection
 ```
 
 Sort the mutations.
@@ -59,7 +59,7 @@ Generate the input type.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:input Selection
+bin/rails g graphql:input Selection
 ```
 
 Remove every argument except `round_id` and make `round_id` required.
@@ -146,7 +146,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/round_test.rb
+bin/rails t test/models/round_test.rb
 ```
 
 Add tests for `Selection`.
@@ -199,7 +199,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/selection_test.rb
+bin/rails t test/models/selection_test.rb
 ```
 
 Testing for true randomness can be difficult so we just wrote some pretty simple tests.
@@ -209,7 +209,7 @@ Generate a test for the mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/mutation_type/selection_create
+bin/rails g integration_test types/mutation_type/selection_create
 ```
 
 Fill in the generated test.
@@ -311,7 +311,7 @@ Run the new tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/mutation_type/selection_create_test.rb
+bin/rails t test/integration/types/mutation_type/selection_create_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -319,7 +319,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

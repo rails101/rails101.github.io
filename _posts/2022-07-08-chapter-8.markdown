@@ -14,7 +14,7 @@ Start tailing our test logs.
 `Terminal`
 
 ```bash
-$ tail -f log/test.log
+tail -f log/test.log
 ```
 
 You'll need to leave this running.
@@ -24,7 +24,7 @@ Run the tests again.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Taking a look at our logs, you should see two distinct sets of lines. The first set is related to loading fixtures and other setup. The second set is related to the test itself. Furthermore, for the test lines, we're only concerned about lines related to the actual request, the lines that happen between `Started` and `Completed`. Here's what I see:
@@ -72,7 +72,7 @@ Run the tests again.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Don't mind the failure, but take a look back at the logs and things are much worse! We can see the cache helping out a bit, but we can do better. Our main weapon against N+1 queries is [includes](https://guides.rubyonrails.org/active_record_querying.html#includes).
@@ -100,7 +100,7 @@ Run the tests again.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Check the logs and things should look much better. You can see that, `includes` has drastically cut down the number of requests to the database. We now make a single `SELECT` each, for `rounds`, `selections`, and `users`.
@@ -112,7 +112,7 @@ Run the tests again.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Tests are passing again and our logs should look the same as before, just with less data this time.
@@ -272,7 +272,7 @@ Run the tests again.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 We haven't changed any functionality so tests are still green. However, if you check the logs, you'll see that we're fetching selections and users from the database, regardless of whether we actually need them. Finally, here is the big payoff.
@@ -333,7 +333,7 @@ Run the tests once more.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Checking the logs should reveal that we're only selecting data when it's actually needed. For example, we only see `SELECT "users".* FROM "users" ...` when the `user` field is included in the GraphQL request.
@@ -343,7 +343,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

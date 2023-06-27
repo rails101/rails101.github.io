@@ -16,7 +16,7 @@ Check out the available generators by using the `--help` flag.
 `Terminal`
 
 ```bash
-$ bin/rails g --help
+bin/rails g --help
 ```
 
 Use the `graphql:mutation_create` generator.
@@ -24,7 +24,7 @@ Use the `graphql:mutation_create` generator.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:mutation_create User
+bin/rails g graphql:mutation_create User
 ```
 
 You'll see that the generator modified `app/graphql/types/mutation_type.rb` and created `app/graphql/mutations/user_create.rb`. Looking at our new mutation class, we can see that most of the work happens in the `resolve` method. If the new user fails to save, we raise a `GraphQL::ExecutionError` error. If the new user saves just fine, we return a response with the `user` field set. The mutation is nearly complete and we got it for free, but let's add our own flavor to it. We can make error handling more generic, like we did in Chapter 4, and replace the existing lines with a single `create!` call. We also see a new input type, `Types::UserInputType`, that we'll need to generate.
@@ -86,7 +86,7 @@ Generate the input type.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:input User
+bin/rails g graphql:input User
 ```
 
 We can see that our new class picked up all `User` attributes, but we only intend to accept `name` and `email`. We also intend to require `name` and `email`.
@@ -109,7 +109,7 @@ Generate a test for the mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/mutation_type/user_create
+bin/rails g integration_test types/mutation_type/user_create
 ```
 
 Fill in the generated test.
@@ -207,7 +207,7 @@ Run the new tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/mutation_type/user_create_test.rb
+bin/rails t test/integration/types/mutation_type/user_create_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -215,7 +215,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

@@ -14,9 +14,9 @@ Check your versions.
 `Terminal`
 
 ```bash
-$ ruby -v
-$ rails -v
-$ postgres -V
+ruby -v
+rails -v
+postgres -V
 ```
 
 Create a new API only Rails application.
@@ -24,10 +24,10 @@ Create a new API only Rails application.
 `Terminal`
 
 ```bash
-$ rails new all_hands --database=postgresql --api
-$ cd all_hands
-$ g add .
-$ g commit -m "Initial commit" -m "rails new all_hands --database=postgresql --api"
+rails new all_hands --database=postgresql --api
+cd all_hands
+g add .
+g commit -m "Initial commit" -m "rails new all_hands --database=postgresql --api"
 ```
 
 Start the server.
@@ -35,7 +35,7 @@ Start the server.
 `Terminal`
 
 ```bash
-$ bin/rails s
+bin/rails s
 ```
 
 Let the server run and visit [http://localhost:3000](http://localhost:3000).
@@ -47,7 +47,7 @@ If you see `ActiveRecord::ConnectionNotEstablished`, start the service.
 `Terminal`
 
 ```bash
-$ brew services start postgresql
+brew services start postgresql
 ```
 
 If you see `ActiveRecord::NoDatabaseError`, create the database.
@@ -55,8 +55,8 @@ If you see `ActiveRecord::NoDatabaseError`, create the database.
 `Terminal`
 
 ```bash
-$ bin/rails db:create
-$ bin/rails db:migrate
+bin/rails db:create
+bin/rails db:migrate
 ```
 
 Finally, refresh the page and you'll see a Rails welcome screen. In your project directory, you might notice a new file named `db/schema.rb`. Whenever we have uncommitted changes and seem to be at a good stopping point, you'll see a box like the one below.

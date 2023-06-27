@@ -14,7 +14,7 @@ Generate a `RoundType`.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:object Round selections:\[Selection\]
+bin/rails g graphql:object Round selections:\[Selection\]
 ```
 
 Make sure `selections` can't be `null`.
@@ -37,7 +37,7 @@ Generate a `SelectionType`.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:object Selection user:User
+bin/rails g graphql:object Selection user:User
 ```
 
 We'll make two changes to `SelectionType`. First we'll remove `round_id` and `user_id` since we'll want to leverage the graph instead of these particular ID fields. Second, we'll make sure `user` can't be `null`.
@@ -88,7 +88,7 @@ Run the new test.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/round_test.rb
+bin/rails t test/models/round_test.rb
 ```
 
 Now we're ready to add our `rounds` field. You might be tempted to just write `Round.all`. I see it often, but we want results to be exact and consistent so we will use `Round.all.order(:id)`.
@@ -139,7 +139,7 @@ Generate a test for the new field.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/query_type/rounds
+bin/rails g integration_test types/query_type/rounds
 ```
 
 Fill in the generated test.
@@ -222,7 +222,7 @@ Run the new test.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/rounds_test.rb
+bin/rails t test/integration/types/query_type/rounds_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -230,7 +230,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

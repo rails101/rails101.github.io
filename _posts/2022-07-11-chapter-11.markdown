@@ -16,7 +16,7 @@ Generate a new mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:mutation_delete Selection
+bin/rails g graphql:mutation_delete Selection
 ```
 
 Sort the mutations.
@@ -61,7 +61,7 @@ Generate a test for the mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/mutation_type/selection_delete
+bin/rails g integration_test types/mutation_type/selection_delete
 ```
 
 Fill in the generated tests.
@@ -135,7 +135,7 @@ Run the new test.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/mutation_type/selection_delete_test.rb
+bin/rails t test/integration/types/mutation_type/selection_delete_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -143,7 +143,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

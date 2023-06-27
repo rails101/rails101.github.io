@@ -66,7 +66,7 @@ Generate a test for our new field.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/query_type/user
+bin/rails g integration_test types/query_type/user
 ```
 
 Fill in the generated test.
@@ -139,7 +139,7 @@ Run the new tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/query_type/user_test.rb
+bin/rails t test/integration/types/query_type/user_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -147,7 +147,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

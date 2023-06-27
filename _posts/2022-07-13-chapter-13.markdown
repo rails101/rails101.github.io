@@ -117,7 +117,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/user_test.rb
+bin/rails t test/models/user_test.rb
 ```
 
 Add tests for `Round#available_users`.
@@ -235,7 +235,7 @@ Run the tests.
 `Terminal`
 
 ```bash
-$ bin/rails t test/models/selection_test.rb
+bin/rails t test/models/selection_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -243,7 +243,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Uh oh! Our `users` query is returning more data than our test is expecting because of the new fixtures. Easy fix.
@@ -309,7 +309,7 @@ Check for regressions by running all tests (again).
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!

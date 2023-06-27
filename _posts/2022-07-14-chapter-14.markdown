@@ -16,7 +16,7 @@ Generate a new mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g graphql:mutation UserArchive
+bin/rails g graphql:mutation UserArchive
 ```
 
 Sort the mutations.
@@ -64,7 +64,7 @@ Generate a test for the mutation.
 `Terminal`
 
 ```bash
-$ bin/rails g integration_test types/mutation_type/user_archive
+bin/rails g integration_test types/mutation_type/user_archive
 ```
 
 Fill in the generated test.
@@ -157,7 +157,7 @@ Run the test.
 `Terminal`
 
 ```bash
-$ bin/rails t test/integration/types/mutation_type/user_archive_test.rb
+bin/rails t test/integration/types/mutation_type/user_archive_test.rb
 ```
 
 Check for regressions by running all tests.
@@ -165,7 +165,7 @@ Check for regressions by running all tests.
 `Terminal`
 
 ```bash
-$ bin/rails t
+bin/rails t
 ```
 
 Success!
