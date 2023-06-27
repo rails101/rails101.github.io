@@ -17,8 +17,6 @@ Open up a console.
 
 ```bash
 $ bin/rails c
-Loading development environment (Rails 7.0.3.1)
-irb(main):001:0>
 ```
 
 Reset the archived status of all users and benchmark the update.
@@ -39,10 +37,6 @@ Start the first database console.
 
 ```bash
 $ bin/rails dbconsole
-psql (14.2)
-Type "help" for help.
-
-all_hands_development=#
 ```
 
 Inspect the existing locks.
@@ -79,10 +73,6 @@ Start a second console.
 
 ```bash
 $ bin/rails dbconsole
-psql (14.2)
-Type "help" for help.
-
-all_hands_development=#
 ```
 
 Begin a large update, promoting everyone to captain.
@@ -116,10 +106,6 @@ Start a third console.
 
 ```bash
 $ bin/rails dbconsole
-psql (14.2)
-Type "help" for help.
-
-all_hands_development=#
 ```
 
 Confirm that the locks do not affect data reads.
@@ -205,7 +191,7 @@ What I personally take from this exercise is that the problem isn't really with 
 
 Toggle archived status again, but use `in_batches`.
 
-**Rails Console** (output omitted)
+**Rails Console**
 
 ```ruby
 > puts Benchmark.measure { User.in_batches.update_all("archived = NOT archived") }

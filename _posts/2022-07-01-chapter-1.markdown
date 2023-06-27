@@ -15,16 +15,13 @@ Check your versions.
 
 ```bash
 $ ruby -v
-ruby 3.1.2p20 (2022-04-12 revision 4491bb740a) [x86_64-darwin21]
 $ rails -v
-Rails 7.0.3.1
 $ postgres -V
-postgres (PostgreSQL) 14.2
 ```
 
 Create a new API only Rails application.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ rails new all_hands --database=postgresql --api
@@ -35,7 +32,7 @@ $ g commit -m "Initial commit" -m "rails new all_hands --database=postgresql --a
 
 Start the server.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails s
@@ -51,7 +48,6 @@ If you see `ActiveRecord::ConnectionNotEstablished`, start the service.
 
 ```bash
 $ brew services start postgresql
-==> Successfully started `postgresql` (label: homebrew.mxcl.postgresql)
 ```
 
 If you see `ActiveRecord::NoDatabaseError`, create the database.
@@ -60,8 +56,6 @@ If you see `ActiveRecord::NoDatabaseError`, create the database.
 
 ```bash
 $ bin/rails db:create
-Created database 'all_hands_development'
-Created database 'all_hands_test'
 $ bin/rails db:migrate
 ```
 

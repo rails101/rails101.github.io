@@ -17,12 +17,6 @@ Generate a `Round` model.
 
 ```bash
 $ bin/rails g model round
-      invoke  active_record
-      create    db/migrate/20220725234357_create_rounds.rb
-      create    app/models/round.rb
-      invoke    test_unit
-      create      test/models/round_test.rb
-      create      test/fixtures/rounds.yml
 ```
 
 Run the migration.
@@ -31,10 +25,6 @@ Run the migration.
 
 ```bash
 $ bin/rails db:migrate
-== 20220725234357 CreateRounds: migrating =====================================
--- create_table(:rounds)
-   -> 0.0118s
-== 20220725234357 CreateRounds: migrated (0.0119s) ============================
 ```
 
 Generate a `Selection` model.
@@ -43,12 +33,6 @@ Generate a `Selection` model.
 
 ```bash
 $ bin/rails g model selection round:belongs_to user:belongs_to
-      invoke  active_record
-      create    db/migrate/20220725234614_create_selections.rb
-      create    app/models/selection.rb
-      invoke    test_unit
-      create      test/models/selection_test.rb
-      create      test/fixtures/selections.yml
 ```
 
 This time we're going to make some very specific changes to the generated migration. We won't allow adding users to a round more than once. To enforce this at the database level, we'll add a [multicolumn index](https://www.postgresql.org/docs/current/indexes-multicolumn.html) on `round_id` and `user_id` with a uniqueness constraint. Since the database will be able to use this index for queries using just the leftmost column of our index, `round_id`, another index on `round_id` would be redundant. We'll actually tell Rails not to create one by using `index: false`.
@@ -77,10 +61,6 @@ Run the migration.
 
 ```bash
 $ bin/rails db:migrate
-== 20220725234614 CreateSelections: migrating =================================
--- create_table(:selections)
-   -> 0.0144s
-== 20220725234614 CreateSelections: migrated (0.0144s) ========================
 ```
 
 Check the changes to `db/schema.rb` to make sure things worked as expected. Just like with `User`, we now want to add in validations to `Selection` to match our database constraints. Our required validation can be summed up as "validate that the user is unique to the round." Unlike with `User`, we won't need presence validations for `round` and `user` since `belongs_to` will handle those for us.
@@ -159,20 +139,11 @@ Run the new tests.
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
-Running 3 tests in a single process (parallelization threshold is 50)
-Run options: --seed 26292
-
-# Running:
-
-...
-
-Finished in 0.082903s, 36.1869 runs/s, 36.1869 assertions/s.
-3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t                                                 

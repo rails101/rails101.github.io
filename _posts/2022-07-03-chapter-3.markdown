@@ -26,7 +26,7 @@ gem "graphql", "~> 2.0"
 
 Make sure to install it.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bundle
@@ -38,7 +38,7 @@ You'll see that a lot of boilerplate code has been generated.
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t
@@ -58,7 +58,6 @@ Generate a new type to match the existing model.
 
 ```bash
 $ bin/rails g graphql:object User
-      create  app/graphql/types/user_type.rb
 ```
 
 Take a good look at `app/graphql/types/user_type.rb`. Since our type name matches our model name, the generator was able to identify the columns and add matching fields. Too easy! Next, we need to expose this new type in the API. The way we do that is by adding a root-level field to our `QueryType`. Let's add a field named `users`.
@@ -91,8 +90,6 @@ Our `users` field should be working, but we need to be sure. This generator did 
 
 ```bash
 $ bin/rails g integration_test types/query_type/users
-      invoke  test_unit
-      create    test/integration/types/query_type/users_test.rb
 ```
 
 Fill in the generated test.
@@ -153,20 +150,11 @@ Run the new tests.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/users_test.rb
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 54676
-
-# Running:
-
-.
-
-Finished in 0.140711s, 7.1068 runs/s, 7.1068 assertions/s.
-1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

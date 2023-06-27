@@ -13,7 +13,7 @@ So far we're only fetching data through graphql queries, but this user story wil
 
 Check out the available generators by using the `--help` flag.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails g --help
@@ -25,7 +25,6 @@ Use the `graphql:mutation_create` generator.
 
 ```bash
 $ bin/rails g graphql:mutation_create User
-      create  app/graphql/mutations/user_create.rb
 ```
 
 You'll see that the generator modified `app/graphql/types/mutation_type.rb` and created `app/graphql/mutations/user_create.rb`. Looking at our new mutation class, we can see that most of the work happens in the `resolve` method. If the new user fails to save, we raise a `GraphQL::ExecutionError` error. If the new user saves just fine, we return a response with the `user` field set. The mutation is nearly complete and we got it for free, but let's add our own flavor to it. We can make error handling more generic, like we did in Chapter 4, and replace the existing lines with a single `create!` call. We also see a new input type, `Types::UserInputType`, that we'll need to generate.
@@ -88,7 +87,6 @@ Generate the input type.
 
 ```bash
 $ bin/rails g graphql:input User
-      create  app/graphql/types/user_input_type.rb
 ```
 
 We can see that our new class picked up all `User` attributes, but we only intend to accept `name` and `email`. We also intend to require `name` and `email`.
@@ -112,8 +110,6 @@ Generate a test for the mutation.
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/user_create
-      invoke  test_unit
-      create    test/integration/types/mutation_type/user_create_test.rb
 ```
 
 Fill in the generated test.
@@ -212,20 +208,11 @@ Run the new tests.
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/user_create_test.rb
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 41325
-
-# Running:
-
-..
-
-Finished in 0.126581s, 15.8002 runs/s, 31.6003 assertions/s.
-2 runs, 4 assertions, 0 failures, 0 errors, 0 skip
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

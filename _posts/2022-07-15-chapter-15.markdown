@@ -35,13 +35,11 @@ Start the rails console.
 
 ```bash
 $ bin/rails c
-Loading development environment (Rails 7.0.3.1)
-irb(main):001:0>
 ```
 
 Add a million users with random data.
 
-**Rails Console** (output omitted)
+**Rails Console**
 
 ```ruby
 > def random_attributes
@@ -97,8 +95,6 @@ Generate a migration.
 
 ```bash
 $ bin/rails g migration AddIndexToUsersOnArchivedName
-      invoke  active_record
-      create    db/migrate/20220728212208_add_index_to_users_on_archived_name.rb
 ```
 
 Fill in the new migration.
@@ -119,10 +115,6 @@ Run the migration.
 
 ```bash
 $ bin/rails db:migrate
-== 20220728212208 AddIndexToUsersOnArchivedName: migrating ====================
--- add_index(:users, [:archived, :name])
-   -> 1.8285s
-== 20220728212208 AddIndexToUsersOnArchivedName: migrated (1.8286s) ===========
 ```
 
 See how the new index affects the query plan.
@@ -160,10 +152,6 @@ Roll back the migration.
 
 ```bash
 $ bin/rails db:rollback
-== 20220728212208 AddIndexToUsersOnArchivedName: reverting ====================
--- remove_index(:users, [:archived, :name])
-   -> 0.0060s
-== 20220728212208 AddIndexToUsersOnArchivedName: reverted (0.0125s) ===========
 ```
 
 Update the new migration with a partial index.
@@ -185,10 +173,6 @@ Run the migration.
 
 ```bash
 $ bin/rails db:migrate
-== 20220728212208 AddIndexToUsersOnArchivedName: migrating ====================
--- add_index(:users, :name, {:where=>"NOT archived", :name=>"index_users_on_name_where_not_archived"})
-   -> 0.3492s
-== 20220728212208 AddIndexToUsersOnArchivedName: migrated (0.3493s) ===========
 ```
 
 See how this index affects the query plan.
@@ -277,20 +261,11 @@ Run the tests.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/users_test.rb
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 33717
-
-# Running:
-
-.
-
-Finished in 0.167782s, 5.9601 runs/s, 5.9601 assertions/s.
-1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

@@ -17,7 +17,6 @@ Generate a mutation.
 
 ```bash
 $ bin/rails g graphql:mutation_create Selection
-      create  app/graphql/mutations/selection_create.rb
 ```
 
 Sort the mutations.
@@ -61,7 +60,6 @@ Generate the input type.
 
 ```bash
 $ bin/rails g graphql:input Selection
-      create  app/graphql/types/selection_input_type.rb
 ```
 
 Remove every argument except `round_id` and make `round_id` required.
@@ -149,15 +147,6 @@ Run the tests.
 
 ```bash
 $ bin/rails t test/models/round_test.rb
-Running 4 tests in a single process (parallelization threshold is 50)
-Run options: --seed 61662
-
-# Running:
-
-....
-
-Finished in 0.117191s, 34.1323 runs/s, 34.1323 assertions/s.
-4 runs, 4 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Add tests for `Selection`.
@@ -211,15 +200,6 @@ Run the tests.
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
-Running 7 tests in a single process (parallelization threshold is 50)
-Run options: --seed 5916
-
-# Running:
-
-.......
-
-Finished in 0.158292s, 44.2221 runs/s, 50.5395 assertions/s.
-7 runs, 8 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Testing for true randomness can be difficult so we just wrote some pretty simple tests.
@@ -230,8 +210,6 @@ Generate a test for the mutation.
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/selection_create
-      invoke  test_unit
-      create    test/integration/types/mutation_type/selection_create_test.rb
 ```
 
 Fill in the generated test.
@@ -334,20 +312,11 @@ Run the new tests.
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/selection_create_test.rb
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 6626
-
-# Running:
-
-..
-
-Finished in 0.150902s, 13.2536 runs/s, 26.5073 assertions/s.
-2 runs, 4 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

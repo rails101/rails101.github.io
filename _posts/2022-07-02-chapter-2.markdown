@@ -11,7 +11,7 @@ The first thing you'll notice about this guide is that I'll take your through [v
 
 Check out documentation for the `generate model` command.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails generate model
@@ -25,12 +25,6 @@ Generate a `User` model.
 
 ```bash
 $ bin/rails generate model user name:string email:string:uniq
-      invoke  active_record
-      create    db/migrate/20220724210619_create_users.rb
-      create    app/models/user.rb
-      invoke    test_unit
-      create      test/models/user_test.rb
-      create      test/fixtures/users.yml
 ```
 
 Take a look at what was generated for you. We're off to a great start just by leveraging the magic of Rails, but we want to make some changes of our own. First we'll check the migration. We're creating the `users` table with `name` and `email` fields. We're also adding a unique index on `email`. There are two benefits to this index. First, it ensures that two users can't be created with the same email. Second, it can speed up queries that search and filter by email.
@@ -61,12 +55,6 @@ Run the migration.
 
 ```bash
 $ bin/rails db:migrate
-== 20220724210619 CreateUsers: migrating ======================================
--- create_table(:users)
-   -> 0.0058s
--- add_index(:users, "lower(email)", {:unique=>true})
-   -> 0.0016s
-== 20220724210619 CreateUsers: migrated (0.0074s) =============================
 ```
 
 You'll notice that it automatically updates `db/schema.rb`. Now that we've handled our database, we want to enforce the same constraints in our application code. We want to enforce it in the `User` model, to be exact. The way we do this is with model validations. We want to validate that both `name` and `email` are present. We also want to validate that `email` is unique among all users.
@@ -120,7 +108,7 @@ end
 
 Make sure to install the new gem.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bundle install
@@ -163,15 +151,6 @@ Run the tests.
 
 ```bash
 $ bin/rails t
-Running 3 tests in a single process (parallelization threshold is 50)
-Run options: --seed 26441
-
-# Running:
-
-...
-
-Finished in 0.042887s, 69.9513 runs/s, 69.9513 assertions/s.
-3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Success!

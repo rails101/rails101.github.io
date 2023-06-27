@@ -17,7 +17,6 @@ Generate a new mutation.
 
 ```bash
 $ bin/rails g graphql:mutation_delete Selection
-      create  app/graphql/mutations/selection_delete.rb
 ```
 
 Sort the mutations.
@@ -63,8 +62,6 @@ Generate a test for the mutation.
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/selection_delete
-      invoke  test_unit
-      create    test/integration/types/mutation_type/selection_delete_test.rb
 ```
 
 Fill in the generated tests.
@@ -139,20 +136,11 @@ Run the new test.
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/selection_delete_test.rb
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 6405
-
-# Running:
-
-.
-
-Finished in 0.158372s, 6.3142 runs/s, 18.9427 assertions/s.
-1 runs, 3 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

@@ -11,7 +11,7 @@ What we have works, but something stands out. Whenever we're requesting records 
 
 Start tailing our test logs.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ tail -f log/test.log
@@ -25,15 +25,6 @@ Run the tests again.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 52072
-
-# Running:
-
-.
-
-Finished in 0.198494s, 5.0379 runs/s, 5.0379 assertions/s.
-1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Taking a look at our logs, you should see two distinct sets of lines. The first set is related to loading fixtures and other setup. The second set is related to the test itself. Furthermore, for the test lines, we're only concerned about lines related to the actual request, the lines that happen between `Started` and `Completed`. Here's what I see:
@@ -78,7 +69,7 @@ end
 
 Run the tests again.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -106,7 +97,7 @@ end
 
 Run the tests again.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -122,15 +113,6 @@ Run the tests again.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
-Running 1 tests in a single process (parallelization threshold is 50)
-Run options: --seed 1996
-
-# Running:
-
-.
-
-Finished in 0.172344s, 5.8023 runs/s, 5.8023 assertions/s.
-1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Tests are passing again and our logs should look the same as before, just with less data this time.
@@ -291,15 +273,6 @@ Run the tests again.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
-Running 3 tests in a single process (parallelization threshold is 50)
-Run options: --seed 24874
-
-# Running:
-
-...
-
-Finished in 0.181486s, 16.5302 runs/s, 16.5302 assertions/s.
-3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 We haven't changed any functionality so tests are still green. However, if you check the logs, you'll see that we're fetching selections and users from the database, regardless of whether we actually need them. Finally, here is the big payoff.
@@ -361,22 +334,13 @@ Run the tests once more.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
-Running 3 tests in a single process (parallelization threshold is 50)
-Run options: --seed 58569
-
-# Running:
-
-...
-
-Finished in 0.181383s, 16.5396 runs/s, 16.5396 assertions/s.
-3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Checking the logs should reveal that we're only selecting data when it's actually needed. For example, we only see `SELECT "users".* FROM "users" ...` when the `user` field is included in the GraphQL request.
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

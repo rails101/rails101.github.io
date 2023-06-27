@@ -118,15 +118,6 @@ Run the tests.
 
 ```bash
 $ bin/rails t test/models/user_test.rb
-Running 5 tests in a single process (parallelization threshold is 50)
-Run options: --seed 39806
-
-# Running:
-
-.....
-
-Finished in 0.101266s, 49.3749 runs/s, 49.3749 assertions/s.
-5 runs, 5 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Add tests for `Round#available_users`.
@@ -245,20 +236,11 @@ Run the tests.
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
-Running 7 tests in a single process (parallelization threshold is 50)
-Run options: --seed 14374
-
-# Running:
-
-.......
-
-Finished in 0.099506s, 70.3475 runs/s, 100.4965 assertions/s.
-7 runs, 10 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t
@@ -324,7 +306,7 @@ end
 
 Check for regressions by running all tests (again).
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t

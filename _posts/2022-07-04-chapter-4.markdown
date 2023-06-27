@@ -67,8 +67,6 @@ Generate a test for our new field.
 
 ```bash
 $ bin/rails g integration_test types/query_type/user
-      invoke  test_unit
-      create    test/integration/types/query_type/user_test.rb
 ```
 
 Fill in the generated test.
@@ -142,20 +140,11 @@ Run the new tests.
 
 ```bash
 $ bin/rails t test/integration/types/query_type/user_test.rb
-Running 2 tests in a single process (parallelization threshold is 50)
-Run options: --seed 23651
-
-# Running:
-
-..
-
-Finished in 0.151358s, 13.2137 runs/s, 13.2137 assertions/s.
-2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
 ```
 
 Check for regressions by running all tests.
 
-`Terminal` (output omitted)
+`Terminal`
 
 ```bash
 $ bin/rails t
