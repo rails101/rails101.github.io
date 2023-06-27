@@ -11,9 +11,7 @@ Before we continue with the what, let's think about the why. In this guide, we'l
 
 Let's start with our first user story.
 
-```
-📝 As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
-```
+> 📝 As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
 
 First, we have to decide which type of API to build. [GraphQL](https://graphql.org/) has been steadily growing in popularity thanks to its long list of benefits. Our specific flavor will be [GraphQL Ruby](https://graphql-ruby.org/).
 
@@ -180,8 +178,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
-```
+> ✅ As an app user, I want to see the full list of users, so that I can know who is available to lead all hands.
 
 {% include next-link.markdown %}

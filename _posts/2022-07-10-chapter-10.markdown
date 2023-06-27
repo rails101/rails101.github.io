@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to create a selection, so that we can have a host for the next All Hands.
-```
+> 📝 As an app user, I want to create a selection, so that we can have a host for the next All Hands.
 
 This is why we're here - we're ready to select a user! Let's remind ourselves how the selection process should work. We will pick randomly from the pool of available engineers and mark the selection by creating a new selection record. Users are available for selection if they were created before this round was created and have not yet been selected for it.
 
@@ -361,8 +359,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to create a selection, so that we can have a host for the next All Hands.
-```
+> ✅ As an app user, I want to create a selection, so that we can have a host for the next All Hands.
 
 {% include next-link.markdown %}

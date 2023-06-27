@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to see the archived status of users, so that I can know who is available.
-```
+> 📝 As an app user, I want to see the archived status of users, so that I can know who is available.
 
 Up until now we've assumed that users will be around forever, but there are many reasons why we'd want to archive a user. For this we'll need to store someone's archived status. Some options are a string/integer/enum field named `state`, a timestamp field named `archived_at`, or a boolean field named `archived`. `state` may be a great choice when there are multiple states required. `archived_at` would be useful as well because not only does a timestamp tell you whether a flag has been set, it tells you when. For our app, though, we don't anticipate any further state complexity or timestamp requirements. Let's just go with the simplest and smallest of the three, a boolean field named `archived`.
 
@@ -277,8 +275,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to see the archived status of users, so that I can know who is available.
-```
+> ✅ As an app user, I want to see the archived status of users, so that I can know who is available.
 
 {% include next-link.markdown %}

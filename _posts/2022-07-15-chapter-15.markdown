@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
-```
+> 📝 As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
 
 Our application was stable and working well, but our company has recently seen massive growth and thus the number of users in our production database has increased massively. This is great news, but now we're seeing some new issues at scale. To simulate this scale, we'll add some users to our development database. If you've been testing manually, this will cause the `users` root-level field to take a very long time to respond or not respond at all. The first thing we'll want to do is limit the number of records that can be retrieved at once. For the sake of brevity, arguments, pagination logic, and tests are left as an excercise for the reader. We'll just hardcode a typical Active Record query chain for now.
 
@@ -304,8 +302,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
-```
+> ✅ As an app user, I want to filter, order, and limit users, so that I can find users more quickly.
 
 {% include next-link.markdown %}

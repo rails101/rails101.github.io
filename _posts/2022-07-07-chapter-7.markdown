@@ -261,8 +261,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to see all rounds and selections, so that I can see selection history.
-```
+> ✅ As an app user, I want to see all rounds and selections, so that I can see selection history.
 
 {% include next-link.markdown %}

@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to see all rounds and selections, so that I can see selection history.
-```
+> 📝 As an app user, I want to see all rounds and selections, so that I can see selection history.
 
 To get started, we'll need "round" and "selection" concepts. There's a few things to keep in mind as we architect the models. We want selections to be completely random. We should not select users twice in a row. Similarly, we should exhaust the list of available users before choosing a user again. If I were a new engineer, I wouldn't want to host right away, so let's prevent new engineers from being selected for the current round. The general approach will be: start a round, select engineers to host until we've exhausted the list of available engineers, then start a new round. We'll only select from engineers that were created before the round was created. We have our existing users table. We'll need `rounds` and `selections` tables. `selections` will join `users` with `rounds`. When we create the `Round` model, we won't need any fields besides the ID and timestamps. That's perfectly okay.
 

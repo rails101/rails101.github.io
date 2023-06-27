@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to archive a user, so that they are removed from the selection process.
-```
+> 📝 As an app user, I want to archive a user, so that they are removed from the selection process.
 
 We're finally ready to give clients the ability to modify a user's archived status. We already know exactly what we'll need.
 
@@ -188,8 +186,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to archive a user, so that they are removed from the selection process.
-```
+> ✅ As an app user, I want to archive a user, so that they are removed from the selection process.
 
 {% include next-link.markdown %}

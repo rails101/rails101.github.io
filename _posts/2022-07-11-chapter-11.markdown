@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to delete a selection, so that I can make the user available again.
-```
+> 📝 As an app user, I want to delete a selection, so that I can make the user available again.
 
 So far we've only created. Now it's time to destroy. Lucky for us this should be pretty simple, but let's think about possible issues. There might be a few things you need to consider when destroying an object and removing its row from the database. One thing might be asynchronous jobs. If you enqueue a job to send an email to a user and then that user is deleted soon after, you might have an issue when the job goes looking. Another major thing to think about is [foreign keys](https://www.postgresql.org/docs/current/tutorial-fk.html). We've used foreign keys in our application already. Databases will not let you delete a record if it is referenced by a foreign key. Luckily, we can delete records just fine if they're referencing another record. For us, we wouldn't be able to delete rounds or users without removing matching selections first. Of course, we can delete selection records at any time because they only point to rounds and users. In general, we perform true deletion sparingly. When records contain important historical data or are referenced by many foreign keys, I would look for an alternative. For example, instead of deleting users I would go with either a `state` or `archived_at` column instead. Here we really want to undo, so let's cause some destruction.
 
@@ -166,8 +164,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to delete a selection, so that I can make the user available again.
-```
+> ✅ As an app user, I want to delete a selection, so that I can make the user available again.
 
 {% include next-link.markdown %}

@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want archived users not to be selected, so that we always have a valid host.
-```
+> 📝 As an app user, I want archived users not to be selected, so that we always have a valid host.
 
 Now that we have the `archived` column working we need to put it to use.
 
@@ -338,8 +336,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want archived users not to be selected, so that we always have a valid host.
-```
+> ✅ As an app user, I want archived users not to be selected, so that we always have a valid host.
 
 {% include next-link.markdown %}

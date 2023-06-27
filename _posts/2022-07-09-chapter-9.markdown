@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As as app user, I want to create a new round, so that I can start the selection process.
-```
+> 📝 As as app user, I want to create a new round, so that I can start the selection process.
 
 We know that we create records through mutations and we've covered the topic before so this should be quick.
 
@@ -135,8 +133,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As as app user, I want to create a new round, so that I can start the selection process.
-```
+> ✅ As as app user, I want to create a new round, so that I can start the selection process.
 
 {% include next-link.markdown %}

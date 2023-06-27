@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
-```
+> 📝 As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
 
 Sometimes you want to update records instead of fetching them. Of course, this too might become an issue at scale. Our current request is a simple but costly update.
 
@@ -215,8 +213,6 @@ Toggle archived status again, but use `in_batches`.
 
 This might run in about the same amount of time as before, but this time our updates were broken up into smaller chunks that didn't clog up the drive-through.
 
-```
-✅ As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
-```
+> ✅ As an app user, I want to toggle the archived status of all users, so that I can run a ghost round.
 
 {% include next-link.markdown %}

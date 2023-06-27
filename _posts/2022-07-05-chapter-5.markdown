@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
-```
+> 📝 As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
 
 So far we're only fetching data through graphql queries, but this user story will require a mutation. Mutations are used to create, update, and destroy records and in this chapter we'll create our first mutation class.
 
@@ -239,8 +237,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
-```
+> ✅ As an app user, I want to create a new user, so that that new engineers are available to host All Hands.
 
 {% include next-link.markdown %}

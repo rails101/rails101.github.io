@@ -7,9 +7,7 @@ categories: guide
 
 {% include previous-link.markdown %}
 
-```
-📝 As an app user, I want to see an individual user, so that I can focus on them.
-```
+> 📝 As an app user, I want to see an individual user, so that I can focus on them.
 
 We'll need another root-level field named `user`. Since we've already got GraphQL completely set up, adding this field should be trivial. There will be one new concept. We'll need to accept an ID parameter. In GraphQL, that is accomplished with the `argument` helper.
 
@@ -169,8 +167,6 @@ Success!
 ✅ Make a commit
 ```
 
-```
-✅ As an app user, I want to see an individual user, so that I can focus on them.
-```
+> ✅ As an app user, I want to see an individual user, so that I can focus on them.
 
 {% include next-link.markdown %}
