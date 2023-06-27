@@ -34,7 +34,7 @@ You'll see that the generator modified `app/graphql/types/mutation_type.rb` and 
 
 Let's clean up `app/graphql/types/mutation_type.rb` a little.
 
-> `app/graphql/types/mutation_type.rb`
+`app/graphql/types/mutation_type.rb`
 
 ```ruby
 module Types
@@ -46,7 +46,7 @@ end
 
 Let's make our changes to `app/graphql/mutations/user_create.rb` as well.
 
-> `app/graphql/mutations/user_create.rb`
+`app/graphql/mutations/user_create.rb`
 
 ```ruby
 module Mutations
@@ -67,7 +67,7 @@ end
 
 Let's add some global error handling.
 
-> `app/graphql/all_hands_schema.rb` (lines omitted)
+`app/graphql/all_hands_schema.rb` (lines omitted)
 
 ```ruby
 class AllHandsSchema < GraphQL::Schema
@@ -97,7 +97,7 @@ We can see that our new class picked up all `User` attributes, but we only inten
 
 Let's make those changes.
 
-> `app/graphql/types/user_input_type.rb`
+`app/graphql/types/user_input_type.rb`
 
 ```ruby
 module Types
@@ -120,7 +120,7 @@ $ bin/rails g integration_test types/mutation_type/user_create
 
 Let's fill in the generated test.
 
-> `test/integration/types/mutation_type/user_create_test.rb`
+`test/integration/types/mutation_type/user_create_test.rb`
 
 ```ruby
 require "test_helper"

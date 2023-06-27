@@ -25,7 +25,7 @@ irb(main):001:0>
 
 Let's reset the archived status of all users and benchmark the update.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > puts Benchmark.measure { User.update_all("archived = NOT archived") }
@@ -49,7 +49,7 @@ all_hands_development=#
 
 Let's start by inspecting the existing locks.
 
-> **PostgreSQL Console (1)**
+**PostgreSQL Console (1)**
 
 ```sql
 =# SELECT relation::regclass, * FROM pg_locks;
@@ -64,7 +64,7 @@ You can see a couple of existing locks, but everything looks normal. For the res
 
 Let's look for locks that have yet to be granted.
 
-> **PostgreSQL Console (1)**
+**PostgreSQL Console (1)**
 
 ```sql
 =# SELECT relation::regclass, * FROM pg_locks WHERE NOT granted;
@@ -89,7 +89,7 @@ all_hands_development=#
 
 Let's begin a large update, promoting everyone to captain.
 
-> **PostgreSQL Console (2)**
+**PostgreSQL Console (2)**
 
 ```sql
 =# begin;
@@ -101,7 +101,7 @@ What we've done is began a transaction and performed an update of every row in t
 
 Let's go back to the first console and look for any locks that have yet to be granted.
 
-> **PostgreSQL Console (1)**
+**PostgreSQL Console (1)**
 
 ```sql
 =# SELECT relation::regclass, * FROM pg_locks WHERE NOT granted;
@@ -126,7 +126,7 @@ all_hands_development=#
 
 Let's confirm that the locks do not affect data reads.
 
-> **PostgreSQL Console (3)**
+**PostgreSQL Console (3)**
 
 ```sql
 =# SELECT name FROM users WHERE id = 1;
@@ -140,7 +140,7 @@ Reading data works fine, but notice we do get the "old" name. The update transac
 
 Let's try a quick update of a single row.
 
-> **PostgreSQL Console (3)**
+**PostgreSQL Console (3)**
 
 ```sql
 =# UPDATE "users" SET name = 'Major ' || name WHERE id = 1;
@@ -150,7 +150,7 @@ What's happening here? No matter how long we wait this command does not return.
 
 Let's go back to the first console and look for any locks that have yet to be granted.
 
-> **PostgreSQL Console (1)**
+**PostgreSQL Console (1)**
 
 ```sql
 =# SELECT relation::regclass, * FROM pg_locks WHERE NOT granted;
@@ -164,7 +164,7 @@ Aha! We do have a lock that's waiting to be granted.
 
 Let's go back to the second console and finally commit the transaction.
 
-> **PostgreSQL Console (2)**
+**PostgreSQL Console (2)**
 
 ```sql
 =# commit;
@@ -172,7 +172,7 @@ Let's go back to the second console and finally commit the transaction.
 
 Let's go back to the first console and look for any locks that have yet to be granted.
 
-> **PostgreSQL Console (1)**
+**PostgreSQL Console (1)**
 
 ```sql
 =# SELECT relation::regclass, * FROM pg_locks WHERE NOT granted;
@@ -185,7 +185,7 @@ Back in the clear!
 
 Checking the third console, you'll see that your last command was able to return successfully.
 
-> **PostgreSQL Console (3)**
+**PostgreSQL Console (3)**
 
 ```sql
 UPDATE 1
@@ -193,7 +193,7 @@ UPDATE 1
 
 Let's see the user's final name.
 
-> **PostgreSQL Console (3)**
+**PostgreSQL Console (3)**
 
 ```sql
 =# SELECT name FROM users WHERE id = 1;
@@ -207,7 +207,7 @@ What I personally take from this exercise is that the problem isn't really with 
 
 Let's toggle archived status again, but using `in_batches`.
 
-> **Rails Console** (output omitted)
+**Rails Console** (output omitted)
 
 ```ruby
 > puts Benchmark.measure { User.in_batches.update_all("archived = NOT archived") }

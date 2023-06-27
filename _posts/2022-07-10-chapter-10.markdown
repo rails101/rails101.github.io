@@ -24,7 +24,7 @@ $ bin/rails g graphql:mutation_create Selection
 
 Let's alphabetize our mutations.
 
-> `app/graphql/types/mutation_type.rb`
+`app/graphql/types/mutation_type.rb`
 
 ```ruby
 module Types
@@ -38,7 +38,7 @@ end
 
 Let's clean up our new mutation class, keeping the input type this time.
 
-> `app/graphql/mutations/selection_create.rb`
+`app/graphql/mutations/selection_create.rb`
 
 ```ruby
 module Mutations
@@ -68,7 +68,7 @@ $ bin/rails g graphql:input Selection
 
 Let's remove every argument except `round_id` and make `round_id` required.
 
-> `app/graphql/types/selection_input_type.rb`
+`app/graphql/types/selection_input_type.rb`
 
 ```ruby
 module Types
@@ -82,7 +82,7 @@ We're not accepting a `user_id` because we're going to handle that server-side. 
 
 Let's add in our new selection logic.
 
-> `app/models/selection.rb`
+`app/models/selection.rb`
 
 ```ruby
 class Selection < ApplicationRecord
@@ -103,7 +103,7 @@ Our additions to the `Selection` model should be pretty easy to follow. After in
 
 Let's add `available_users`.
 
-> `app/models/round.rb`
+`app/models/round.rb`
 
 ```ruby
 class Round < ApplicationRecord
@@ -120,7 +120,7 @@ The body of the method retrieves all users except the ones that are already asso
 
 Let's add our test for `Round`.
 
-> `test/models/round_test.rb`
+`test/models/round_test.rb`
 
 ```ruby
 require "test_helper"
@@ -164,7 +164,7 @@ Finished in 0.117191s, 34.1323 runs/s, 34.1323 assertions/s.
 
 Let's add our test for `Selection`.
 
-> `test/models/selection_test.rb`
+`test/models/selection_test.rb`
 
 ```ruby
 require "test_helper"
@@ -238,7 +238,7 @@ $ bin/rails g integration_test types/mutation_type/selection_create
 
 Let's fill in the generated tests.
 
-> `test/integration/types/mutation_type/selection_create_test.rb`
+`test/integration/types/mutation_type/selection_create_test.rb`
 
 ```ruby
 require "test_helper"

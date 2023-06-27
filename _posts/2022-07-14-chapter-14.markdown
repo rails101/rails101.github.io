@@ -24,7 +24,7 @@ $ bin/rails g graphql:mutation UserArchive
 
 Let's alphabetize our mutations.
 
-> `app/graphql/types/mutation_type.rb`
+`app/graphql/types/mutation_type.rb`
 
 ```ruby
 module Types
@@ -42,7 +42,7 @@ Since we used a more generic generator, we'll have to fill in a lot more by hand
 
 Let's fill in our new mutation.
 
-> `app/graphql/mutations/user_archive.rb`
+`app/graphql/mutations/user_archive.rb`
 
 ```ruby
 module Mutations
@@ -74,7 +74,7 @@ $ bin/rails g integration_test types/mutation_type/user_archive
 
 Let's fill in the generated tests.
 
-> `test/integration/types/mutation_type/user_archive_test.rb`
+`test/integration/types/mutation_type/user_archive_test.rb`
 
 ```ruby
 require "test_helper"

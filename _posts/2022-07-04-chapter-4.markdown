@@ -15,7 +15,7 @@ We'll need another root-level field named `user`. Since we've already got GraphQ
 
 Let's add the `user` field to `QueryType`.
 
-> `app/graphql/types/query_type.rb`
+`app/graphql/types/query_type.rb`
 
 ```ruby
 module Types
@@ -49,7 +49,7 @@ Since `find` will raise an error if it fails to find a record, we need to handle
 
 Let's add some global error handling.
 
-> `app/graphql/all_hands_schema.rb` (lines omitted)
+`app/graphql/all_hands_schema.rb` (lines omitted)
 
 ```ruby
 class AllHandsSchema < GraphQL::Schema
@@ -75,7 +75,7 @@ $ bin/rails g integration_test types/query_type/user
 
 Let's fill in the generated test.
 
-> `test/integration/types/query_type/user_test.rb`
+`test/integration/types/query_type/user_test.rb`
 
 ```ruby
 require "test_helper"

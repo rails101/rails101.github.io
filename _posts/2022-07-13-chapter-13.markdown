@@ -15,7 +15,7 @@ Now that we have the `archived` column working we need to put it to use.
 
 Let's add some archived users to our fixtures to help with testing.
 
-> `test/fixtures/users.yml`
+`test/fixtures/users.yml`
 
 ```yaml
 sarah:
@@ -59,7 +59,7 @@ We know that we're dealing with selections, so a good place to start is our `Sel
 
 Let's refactor `Round#available_users` to not return archived users.
 
-> `app/models/round.rb`
+`app/models/round.rb`
 
 ```ruby
 class Round < ApplicationRecord
@@ -74,7 +74,7 @@ end
 
 Let's add the missing `User.unarchived` method in the form of a scope.
 
-> `app/models/user.rb`
+`app/models/user.rb`
 
 ```ruby
 class User < ApplicationRecord
@@ -88,7 +88,7 @@ end
 
 Let's add tests for `User.unarchived`.
 
-> `test/models/user_test.rb`
+`test/models/user_test.rb`
 
 ```ruby
 require "test_helper"
@@ -133,7 +133,7 @@ Finished in 0.101266s, 49.3749 runs/s, 49.3749 assertions/s.
 
 Let's add tests for `Round#available_users`.
 
-> `test/models/round_test.rb`
+`test/models/round_test.rb`
 
 ```ruby
 require "test_helper"
@@ -183,7 +183,7 @@ Finished in 0.072143s, 55.4454 runs/s, 55.4454 assertions/s.
 
 Let's finish up with our selection tests.
 
-> `test/models/selection_test.rb`
+`test/models/selection_test.rb`
 
 ```ruby
 require "test_helper"
@@ -270,7 +270,7 @@ Uh oh! Our `users` query is returning more data than our test is expecting becau
 
 Let's update our test.
 
-> `test/integration/types/query_type/users_test.rb`
+`test/integration/types/query_type/users_test.rb`
 
 ```ruby
 require "test_helper"

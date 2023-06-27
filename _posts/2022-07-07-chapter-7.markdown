@@ -20,7 +20,7 @@ $ bin/rails g graphql:object Round selections:\[Selection\]
 
 Let's just make sure `selections` can't be `null`.
 
-> `app/graphql/types/round_type.rb`
+`app/graphql/types/round_type.rb`
 
 ```ruby
 module Types
@@ -46,7 +46,7 @@ We'll make two changes to `SelectionType`. First we'll remove `round_id` and `us
 
 Let's make those changes.
 
-> `app/graphql/types/selection_type.rb`
+`app/graphql/types/selection_type.rb`
 
 ```ruby
 module Types
@@ -63,7 +63,7 @@ You might notice that `RoundType` has a `selections` field but the `Round` model
 
 Let's add the relation.
 
-> `app/models/round.rb`
+`app/models/round.rb`
 
 ```ruby
 class Round < ApplicationRecord
@@ -73,7 +73,7 @@ end
 
 Let's add a test.
 
-> `test/models/round_test.rb`
+`test/models/round_test.rb`
 
 ```ruby
 require "test_helper"
@@ -106,7 +106,7 @@ Now we're ready to add our `rounds` field. You might be tempted to just write `R
 
 Let's add our new field.
 
-> `app/graphql/types/query_type.rb`
+`app/graphql/types/query_type.rb`
 
 ```ruby
 module Types
@@ -157,7 +157,7 @@ $ bin/rails g integration_test types/query_type/rounds
 
 Let's fill in the generated test.
 
-> `test/integration/types/query_type/rounds_test.rb`
+`test/integration/types/query_type/rounds_test.rb`
 
 ```ruby
 require "test_helper"

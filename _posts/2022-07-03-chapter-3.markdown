@@ -19,7 +19,7 @@ First, we have to decide which type of API to build. [GraphQL](https://graphql.o
 
 Let's get started by adding the gem to our project.
 
-> `Gemfile` (lines omitted)
+`Gemfile` (lines omitted)
 
 ```ruby
 # Use Graphql for the API
@@ -65,7 +65,7 @@ $ bin/rails g graphql:object User
 
 Take a good look at `app/graphql/types/user_type.rb`. Since our type name matches our model name, the generator was able to identify the columns and add matching fields. Too easy! Next, we need to expose this new type in the API. The way we do that is by adding a root-level field to our `QueryType`. Let's add a field named `users`.
 
-> `app/graphql/types/query_type.rb`
+`app/graphql/types/query_type.rb`
 
 ```ruby
 module Types
@@ -99,7 +99,7 @@ $ bin/rails g integration_test types/query_type/users
 
 Let's fill in the generated test.
 
-> `test/integration/types/query_type/users_test.rb`
+`test/integration/types/query_type/users_test.rb`
 
 ```ruby
 require "test_helper"

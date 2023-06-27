@@ -57,7 +57,7 @@ This time we're going to make some very specific changes to the generated migrat
 
 Let's make those changes.
 
-> `db/migrate/[timestamp]_create_selections.rb`
+`db/migrate/[timestamp]_create_selections.rb`
 
 ```ruby
 class CreateSelections < ActiveRecord::Migration[7.0]
@@ -89,7 +89,7 @@ Check the changes to `db/schema.rb` to make sure things worked as expected. Just
 
 Let's add our changes.
 
-> `app/models/selection.rb`
+`app/models/selection.rb`
 
 ```ruby
 class Selection < ApplicationRecord
@@ -104,7 +104,7 @@ Rails has generated some fixtures for us but the defaults won't quite work.
 
 Let's improve the naming in our `Round` fixtures.
 
-> `test/fixtures/rounds.yml`
+`test/fixtures/rounds.yml`
 
 ```yaml
 full: {}
@@ -114,7 +114,7 @@ empty: {}
 
 Let's make sure our `Selection` fixtures match.
 
-> `test/fixtures/selections.yml`
+`test/fixtures/selections.yml`
 
 ```yaml
 full_chantel:
@@ -138,7 +138,7 @@ We still need a few tests. My personal approach is to open the app file and the 
 
 Let's write test for our `Selection` model.
 
-> `test/models/selection_test.rb`
+`test/models/selection_test.rb`
 
 ```ruby
 require "test_helper"

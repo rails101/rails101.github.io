@@ -15,7 +15,7 @@ Our application was stable and working well, but our company has recently seen m
 
 Let's add a filter, order, and limit to our field.
 
-> `app/graphql/types/query_type.rb` (lines omitted)
+`app/graphql/types/query_type.rb` (lines omitted)
 
 ```ruby
 module Types
@@ -43,7 +43,7 @@ irb(main):001:0>
 
 Let's add a million users with random data.
 
-> **Rails Console** (output omitted)
+**Rails Console** (output omitted)
 
 ```ruby
 > def random_attributes
@@ -63,7 +63,7 @@ With this you'll have at least 1 million users in your database with about a 10%
 
 Let's see the baseline query plan.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > User.unarchived.order(:name).limit(100).explain
@@ -83,7 +83,7 @@ EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER B
 
 Let's see the baseline index size.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
@@ -105,7 +105,7 @@ $ bin/rails g migration AddIndexToUsersOnArchivedName
 
 Let's fill in our new migration.
 
-> `db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
+`db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
 
 ```ruby
 class AddIndexToUsersOnArchivedName < ActiveRecord::Migration[7.0]
@@ -129,7 +129,7 @@ $ bin/rails db:migrate
 
 Let's see how our new index affects the query plan.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > User.unarchived.order(:name).limit(100).explain
@@ -146,7 +146,7 @@ EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER B
 
 Let's see our new index size.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
@@ -170,7 +170,7 @@ $ bin/rails db:rollback
 
 Let's update our new migration with a partial index.
 
-> `db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
+`db/migrate/[timestamp]_add_index_to_users_on_archived_name.rb`
 
 ```ruby
 class AddIndexToUsersOnArchivedName < ActiveRecord::Migration[7.0]
@@ -195,7 +195,7 @@ $ bin/rails db:migrate
 
 Let's see how our this index affects the query plan.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > User.unarchived.order(:name).limit(100).explain
@@ -211,7 +211,7 @@ EXPLAIN for: SELECT "users".* FROM "users" WHERE "users"."archived" = $1 ORDER B
 
 Let's see our new index size.
 
-> **Rails Console**
+**Rails Console**
 
 ```ruby
 > ActiveRecord::Base.connection.exec_query("SELECT pg_size_pretty (pg_indexes_size('users'))").first
@@ -223,7 +223,7 @@ It's no surprise that, at 58, we see huge cost savings with this query plan as w
 
 Let's update the test for this field.
 
-> `test/integration/types/query_type/users_test.rb`
+`test/integration/types/query_type/users_test.rb`
 
 ```ruby
 require "test_helper"

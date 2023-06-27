@@ -27,7 +27,7 @@ We'll make a couple additions to the migration. First, we'll add a not-null cons
 
 Let's make our changes to the migration.
 
-> `db/migrate/[timestamp]_add_archived_to_user.rb`
+`db/migrate/[timestamp]_add_archived_to_user.rb`
 
 ```ruby
 class AddArchivedToUser < ActiveRecord::Migration[7.0]
@@ -51,7 +51,7 @@ $ bin/rails db:migrate
 
 Let's add a validation for our new column.
 
-> `app/models/user.rb`
+`app/models/user.rb`
 
 ```ruby
 class User < ApplicationRecord
@@ -63,7 +63,7 @@ end
 
 Let's test our changes.
 
-> `test/models/user_test.rb`
+`test/models/user_test.rb`
 
 ```ruby
 require "test_helper"
@@ -97,7 +97,7 @@ Finished in 0.077718s, 51.4681 runs/s, 51.4681 assertions/s.
 
 Let's expose our new field to the API.
 
-> `app/graphql/types/user_type.rb`
+`app/graphql/types/user_type.rb`
 
 ```ruby
 module Types
@@ -114,7 +114,7 @@ end
 
 Let's add the new field to relevant tests.
 
-> `test/integration/types/query_type/user_test.rb`
+`test/integration/types/query_type/user_test.rb`
 
 ```ruby
 require "test_helper"
@@ -196,7 +196,7 @@ Finished in 0.136307s, 14.6728 runs/s, 14.6728 assertions/s.
 
 Let's add the new field to one more test.
 
-> `test/integration/types/query_type/users_test.rb`
+`test/integration/types/query_type/users_test.rb`
 
 ```ruby
 require "test_helper"
