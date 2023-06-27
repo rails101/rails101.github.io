@@ -116,7 +116,7 @@ end
 
 Let's run our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/user_test.rb
@@ -167,7 +167,7 @@ end
 
 Let's run our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 Running 4 tests in a single process (parallelization threshold is 50)
@@ -243,7 +243,7 @@ end
 
 Let's run our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
@@ -260,7 +260,7 @@ Finished in 0.099506s, 70.3475 runs/s, 100.4965 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t
@@ -326,7 +326,7 @@ end
 
 Let's also make sure we don't have any regressions by running all of our tests (again).
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

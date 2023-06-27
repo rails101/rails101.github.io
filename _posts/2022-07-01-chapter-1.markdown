@@ -11,7 +11,7 @@ For our "Engineering All Hands" meetings at Hipcamp, we have someone new run it 
 
 Let's check our versions.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ ruby -v
@@ -24,7 +24,7 @@ postgres (PostgreSQL) 14.2
 
 Let's create a new API only Rails application.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ rails new all_hands --database=postgresql --api
@@ -35,7 +35,7 @@ $ g commit -m "Initial commit" -m "rails new all_hands --database=postgresql --a
 
 Let's start the server.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails s
@@ -47,7 +47,7 @@ You should see a lot of red and probably something about the database. That's go
 
 If you see `ActiveRecord::ConnectionNotEstablished`, start the service.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ brew services start postgresql
@@ -56,7 +56,7 @@ $ brew services start postgresql
 
 If you see `ActiveRecord::NoDatabaseError`, create the database.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:create

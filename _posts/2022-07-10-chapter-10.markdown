@@ -15,7 +15,7 @@ This is why we're here - we're ready to select a user! Let's remind ourselves ho
 
 Let's generate our mutation.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:mutation_create Selection
@@ -59,7 +59,7 @@ end
 
 Let's generate our input type.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:input Selection
@@ -147,7 +147,7 @@ end
 
 Let's run these tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/round_test.rb
@@ -209,7 +209,7 @@ end
 
 Let's run these tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
@@ -228,7 +228,7 @@ Testing for true randomness can be difficult so we just wrote some pretty simple
 
 Let's finally generate tests for our mutation.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/selection_create
@@ -332,7 +332,7 @@ end
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/selection_create_test.rb
@@ -349,7 +349,7 @@ Finished in 0.150902s, 13.2536 runs/s, 26.5073 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

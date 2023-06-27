@@ -11,7 +11,7 @@ The first thing you'll notice about this guide is that I'll take your through [v
 
 Let's get an idea of what the generator can do.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails generate model
@@ -21,7 +21,7 @@ Skim through the output to see the available options.
 
 Let's generate our model.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails generate model user name:string email:string:uniq
@@ -57,7 +57,7 @@ end
 
 Let's run our migration.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -120,7 +120,7 @@ end
 
 Let's make sure to install it.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bundle install
@@ -159,7 +159,7 @@ end
 
 Let's run our tests!
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t

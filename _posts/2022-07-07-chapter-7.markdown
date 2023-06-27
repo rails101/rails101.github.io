@@ -11,7 +11,7 @@ To finish up our user story, we need to expose rounds through our API. We'll do 
 
 Let's generate our `RoundType`.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:object Round selections:\[Selection\]
@@ -35,7 +35,7 @@ end
 
 Let's generate our `SelectionType`.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:object Selection user:User
@@ -87,7 +87,7 @@ end
 
 Let's run our new test.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/round_test.rb
@@ -147,7 +147,7 @@ You might be wondering how we can write exact and consistent tests when our fixt
 
 Let's generate a test for our new field.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/query_type/rounds
@@ -232,7 +232,7 @@ end
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -249,7 +249,7 @@ Finished in 0.157249s, 6.3593 runs/s, 6.3593 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

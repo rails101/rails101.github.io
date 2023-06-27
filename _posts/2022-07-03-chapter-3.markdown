@@ -28,7 +28,7 @@ gem "graphql", "~> 2.0"
 
 Let's make sure to install it.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bundle
@@ -40,7 +40,7 @@ You'll see that a lot of boilerplate code has been generated.
 
 Let's make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t
@@ -56,7 +56,7 @@ Let's commit the changes before moving on.
 
 Let's generate a new type to match our existing model.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:object User
@@ -89,7 +89,7 @@ end
 
 Our `users` field should be working, but we need to be sure. This generator did not generate any tests for us like the model generator did. We'll have to start from scratch. Both [GraphQL](https://graphql-ruby.org/testing/integration_tests.html) and [Rails](https://guides.rubyonrails.org/testing.html) provide some insight on the kinds of tests we can write. In general, unit tests test individual objects and integration tests test the application from top to bottom. We previously wrote unit tests for the `User` model. It's fairly difficult to write unit tests for GraphQL types because `new` is actually a `protected` method. Fortunately, Rails and Graphql make it easy for us to write integration tests. You might notice that the term "integration test" is a little fuzzy between Graphql and Rails. What's important is understanding that we're making a real HTTP request and checking the result. Let's write one.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/query_type/users
@@ -151,7 +151,7 @@ This test should seem very straightforward. We make a real request to our graphq
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/users_test.rb
@@ -168,7 +168,7 @@ Finished in 0.140711s, 7.1068 runs/s, 7.1068 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

@@ -15,7 +15,7 @@ Up until now we've assumed that users will be around forever, but there are many
 
 Let's start by generating a migration for our new column.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g migration AddArchivedToUser archived:boolean
@@ -39,7 +39,7 @@ end
 
 Let's run our migration.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -80,7 +80,7 @@ end
 
 Let's run our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/user_test.rb
@@ -179,7 +179,7 @@ end
 
 Let's run the tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/user_test.rb
@@ -248,7 +248,7 @@ end
 
 Let's run the tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/users_test.rb
@@ -265,7 +265,7 @@ Finished in 0.160506s, 6.2303 runs/s, 6.2303 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

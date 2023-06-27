@@ -15,7 +15,7 @@ We know that we create records through mutations and we've covered the topic bef
 
 Let's generate our mutation.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:mutation_create Round
@@ -45,7 +45,7 @@ end
 
 Let's generate our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/round_create
@@ -106,7 +106,7 @@ end
 
 Let's run our new test.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/round_create_test.rb
@@ -123,7 +123,7 @@ Finished in 0.149116s, 6.7062 runs/s, 13.4124 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

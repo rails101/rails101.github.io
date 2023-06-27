@@ -11,7 +11,7 @@ What we have works, but something stands out. Whenever we're requesting records 
 
 Let's start tailing our test logs.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ tail -f log/test.log
@@ -21,7 +21,7 @@ You'll need to leave this running.
 
 Let's run the tests again.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -78,7 +78,7 @@ end
 
 Let's run the tests again.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -106,7 +106,7 @@ end
 
 Let's run the tests again.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -118,7 +118,7 @@ Let's go ahead and undo the changes to `test/integration/types/query_type/rounds
 
 Let's run the tests again.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -287,7 +287,7 @@ end
 
 Let's run the tests again.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -357,7 +357,7 @@ There's a bit going on here. First, `extras: [:lookahead]` makes `lookahead` ava
 
 Let's run the tests once more.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/rounds_test.rb
@@ -376,7 +376,7 @@ Checking the logs should reveal that we're only selecting data when it's actuall
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

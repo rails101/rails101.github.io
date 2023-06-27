@@ -65,7 +65,7 @@ end
 
 Let's generate a test for our new field.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/query_type/user
@@ -140,7 +140,7 @@ This is only slightly more complicated than the previous test class. Here, we pa
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/user_test.rb
@@ -157,7 +157,7 @@ Finished in 0.151358s, 13.2137 runs/s, 13.2137 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

@@ -15,7 +15,7 @@ So far we're only fetching data through graphql queries, but this user story wil
 
 Let's remind ourselves of the available generators by using the `--help` flag.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails g --help
@@ -23,7 +23,7 @@ $ bin/rails g --help
 
 Let's use the `graphql:mutation_create` generator.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:mutation_create User
@@ -86,7 +86,7 @@ end
 
 Let's generate the input type.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g graphql:input User
@@ -110,7 +110,7 @@ end
 
 Let's generate a test for our mutation.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g integration_test types/mutation_type/user_create
@@ -210,7 +210,7 @@ These tests should look similar to the last set we wrote, with a few exceptions.
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/mutation_type/user_create_test.rb
@@ -227,7 +227,7 @@ Finished in 0.126581s, 15.8002 runs/s, 31.6003 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t

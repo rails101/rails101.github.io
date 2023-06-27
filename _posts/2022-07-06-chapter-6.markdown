@@ -15,7 +15,7 @@ To get started, we'll need "round" and "selection" concepts. There's a few thing
 
 Let's generate our `Round` model.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g model round
@@ -29,7 +29,7 @@ $ bin/rails g model round
 
 Let's run migrations.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -41,7 +41,7 @@ $ bin/rails db:migrate
 
 Let's generate our `Selection` model.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g model selection round:belongs_to user:belongs_to
@@ -75,7 +75,7 @@ end
 
 Let's run migrations.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -157,7 +157,7 @@ end
 
 Let's run our new tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/models/selection_test.rb
@@ -174,7 +174,7 @@ Finished in 0.082903s, 36.1869 runs/s, 36.1869 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t                                                 

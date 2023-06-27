@@ -33,7 +33,7 @@ end
 
 Let's start the rails console.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails c
@@ -95,7 +95,7 @@ We've gotten some pretty good information here. First, in the query plan we can 
 
 Let's generate our migration.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails g migration AddIndexToUsersOnArchivedName
@@ -117,7 +117,7 @@ end
 
 Let's run our migration.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -158,7 +158,7 @@ Saying this performs better would be quite the understatement. The cost, at arou
 
 Let's rollback.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:rollback
@@ -183,7 +183,7 @@ end
 
 Let's run our migration.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails db:migrate
@@ -275,7 +275,7 @@ end
 
 Let's run our tests.
 
-> **Terminal**
+`Terminal`
 
 ```bash
 $ bin/rails t test/integration/types/query_type/users_test.rb
@@ -292,7 +292,7 @@ Finished in 0.167782s, 5.9601 runs/s, 5.9601 assertions/s.
 
 Let's also make sure we don't have any regressions by running all of our tests.
 
-> **Terminal** (output omitted)
+`Terminal` (output omitted)
 
 ```bash
 $ bin/rails t
